@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/stoneLeaf/timeflies-backend/issues"
   },
-  "homepage": "https://github.com/stoneLeaf/timeflies-backend#readme"
+  "homepage": "https://github.com/stoneLeaf/timeflies-backend#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
 }
