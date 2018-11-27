@@ -1,0 +1,19 @@
+{
+  "name": "timeflies-backend",
+  "version": "0.1.0",
+  "description": "TimeFlies Node.js backend",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stoneLeaf/timeflies-backend.git"
+  },
+  "author": "stoneLeaf",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stoneLeaf/timeflies-backend/issues"
+  },
+  "homepage": "https://github.com/stoneLeaf/timeflies-backend#readme"
+}
