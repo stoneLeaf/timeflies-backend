@@ -10,3 +10,7 @@ As with my [coding journey](https://github.com/stoneLeaf/coding-journey), I will
 
 > npm install express
 
+Choosing [Winston](https://github.com/winstonjs/winston) for general logging, with [some configuration](https://thisdavej.com/using-winston-a-versatile-logging-library-for-node-js/), and [Morgan](https://github.com/expressjs/morgan) for HTTP requests logging.
+
+> npm install winston morgan
+
