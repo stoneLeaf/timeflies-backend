@@ -14,3 +14,4 @@ Choosing [Winston](https://github.com/winstonjs/winston) for general logging, wi
 
 > npm install winston morgan
 
+At that point I started to create the Node app entry point, *app.js* here, and needed to understand the [concept of middleware](https://expressjs.com/en/guide/using-middleware.html). I had to figure out what *app.use()* does, how path are handled, the use of the *next()* function and the order middlewares are executed.
