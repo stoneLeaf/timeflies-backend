@@ -1,18 +1,21 @@
-const { createLogger, format, transports } = require('winston')
+const logger = require('winston')
 
-const logger = createLogger({
+// Configuring the default Winston logger, that way any module can just
+// require the winston module directly to get the same instance
+logger.configure({
   level: process.env.NODE_ENV === 'production' ? 'info' : 'silly',
-  format: format.combine(
-    format.colorize(),
-    format.timestamp({
+  format: logger.format.combine(
+    logger.format.colorize(),
+    logger.format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss'
     }),
-    format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+    logger.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
   ),
   transports: [
-    new transports.Console()
+    new logger.transports.Console()
   ] })
 
+// Adding a stream function usable by other middlewares like Morgan
 logger.stream = {
   write: function (str) {
     logger.info(str)
