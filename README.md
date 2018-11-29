@@ -21,3 +21,5 @@ Concerning routing, I decided to use Express router modules in chains to get a c
 Although I intended to use an ORM, I thought that I had to try MongoDB first. Being the most common solution amongst Node stacks, it seemed important to have some working knowledge of it.
 
 > npm install mongoose
+
+I must say I'm unexpectedly impressed by mongoose's API. Schemas come with quite a few [helpers for validation](https://mongoosejs.com/docs/schematypes.html#schematype-options) and you can simulate joins with the [*populate()*](https://mongoosejs.com/docs/populate.html) method. Anyway, the first step is reading the [docs](https://mongoosejs.com/docs/), which are quite comprehensive and a must read for a newcomer like myself.

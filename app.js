@@ -5,11 +5,33 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const express = require('express')
 const logger = require('./config/winston')
 const morgan = require('morgan')
+const mongoose = require('mongoose')
 
 const app = express()
 
 // Setting up Morgan with the 'dev' predefined format and Winston's stream
 app.use(morgan('dev', { stream: logger.stream }))
+
+if (process.env.NODE_ENV === 'production') {
+  mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true })
+} else {
+  mongoose.connect('mongodb://localhost:27017/timeflies', { useNewUrlParser: true })
+  mongoose.set('debug', true)
+}
+
+// To prevent deprecation warning of collection.ensureIndex
+mongoose.set('useCreateIndex', true)
+
+var db = mongoose.connection
+
+// Logging open event
+db.on('open', () => logger.info('MongoDB connection opened.'))
+// Handling global errors, might later want to do more than logging
+db.on('error', function (err) { logger.error(err.toString()) })
+
+require('./models/project')
+require('./models/record')
+require('./models/user')
 
 // Parsing all requests as JSON, if it is not, a SyntaxError will be raised
 // TODO: maybe find a better way to discard non-JSON requests because
