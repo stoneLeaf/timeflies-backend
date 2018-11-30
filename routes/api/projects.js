@@ -1,23 +1,15 @@
 const router = require('express').Router()
-const logger = require('winston')
+const ProjectsController = require('../../controllers/projects_controller')
 
-router.param('project_id', function (req, res, next, value, name) {
-  logger.debug('Fetching project from :project_id param')
-  req.project = 'dummy'
-  next()
-})
+router.param('project_id', ProjectsController.setProjectOnParam)
 
 router.get('/projects', function (req, res, next) {
   res.status(200).json({ debug: 'projects list' })
 })
 
-router.post('/projects', function (req, res, next) {
-  res.status(200).json({ debug: 'project create' })
-})
+router.post('/projects', ProjectsController.create)
 
-router.get('/projects/:project_id', function (req, res, next) {
-  res.status(200).json({ debug: 'projects read id ' + req.params.project_id })
-})
+router.get('/projects/:project_id', ProjectsController.read)
 
 router.get('/projects/:project_id/records', function (req, res, next) {
   res.status(200).json({ debug: 'projects id ' + req.params.project_id + ' records' })

@@ -1,16 +1,17 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-
-// TODO: validate name and slug uniqueness in User scope
+const slugify = require('slugify')
 
 var ProjectSchema = new Schema({
   name: {
     type: String,
+    required: true,
     minlength: 2,
     maxlength: 160
   },
   slug: {
     type: String,
+    required: true,
     lowercase: true,
     minlength: 2,
     maxlength: 70
@@ -20,10 +21,14 @@ var ProjectSchema = new Schema({
     trim: true,
     maxlength: 255
   },
-  owner: { type: Schema.Types.ObjectId, ref: 'User' },
-  records: [{ type: Schema.Types.ObjectId, ref: 'Record' }]
+  owner: { type: Schema.Types.ObjectId, ref: 'User', required: true }
+}, { timestamps: true })
+
+ProjectSchema.pre('validate', function () {
+  if (this.name) this.slug = slugify(this.name, { lower: true })
 })
 
-// TODO: pre remove middleware removing dependent records
+// TODO: validate name and slug uniqueness in User scope
+// TODO: add pre/post remove middleware removing dependent records
 
 module.exports = mongoose.model('Project', ProjectSchema)

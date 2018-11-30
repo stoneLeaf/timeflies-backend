@@ -10,8 +10,8 @@ var RecordSchema = new Schema({
     type: Date,
     min: this.start // FIXME: does this actually work?
   },
-  user: { type: Schema.Types.ObjectId, ref: 'User' },
-  project: { type: Schema.Types.ObjectId, ref: 'Project' }
-})
+  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  project: { type: Schema.Types.ObjectId, ref: 'Project', required: true }
+}, { timestamps: true })
 
 module.exports = mongoose.model('Record', RecordSchema)

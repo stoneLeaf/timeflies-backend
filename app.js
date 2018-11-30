@@ -50,9 +50,10 @@ app.use(function (err, req, res, next) {
   if (err.name === 'SyntaxError') {
     // Implying it was raised by the req body parser
     res.status(400).json({ message: 'Request body is not valid JSON' })
+  } else if (err.name === 'ValidationError') {
+    res.status(400).json({ message: 'Validation error', error: err.message })
   } else {
     // Passing it to the default Express error handler
-    logger.debug(err.name)
     next(err)
   }
 })
