@@ -33,10 +33,9 @@ require('./models/project')
 require('./models/record')
 require('./models/user')
 
-// Parsing all requests as JSON, if it is not, a SyntaxError will be raised
-// TODO: maybe find a better way to discard non-JSON requests because
-//       SyntaxError might be thrown elsewhere for other reasons
-app.use(express.json({ type: '*/*' }))
+// Parsing requests
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 // Mounting routes
 app.use(require('./routes'))
@@ -53,6 +52,7 @@ app.use(function (err, req, res, next) {
     res.status(400).json({ message: 'Request body is not valid JSON' })
   } else {
     // Passing it to the default Express error handler
+    logger.debug(err.name)
     next(err)
   }
 })
