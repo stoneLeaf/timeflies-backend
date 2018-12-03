@@ -4,6 +4,7 @@ router.get('/ping', function (req, res, next) {
   res.status(200).json({ status: 'ok' })
 })
 
+router.use(require('./auth'))
 router.use(require('./users'))
 router.use(require('./records'))
 router.use(require('./projects'))

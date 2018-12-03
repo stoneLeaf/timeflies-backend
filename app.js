@@ -33,14 +33,19 @@ require('./models/project')
 require('./models/record')
 require('./models/user')
 
-// Parsing requests
+// Requests parsers
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+// Initializing passport
+const passport = require('passport')
+require('./config/passport')
+app.use(passport.initialize())
 
 // Mounting routes
 app.use(require('./routes'))
 
-// Sending 404 since none of the middlewares responded
+// Sending 404 when none of the middlewares responded
 app.use(function (req, res, next) {
   res.status(404).json({ message: 'Not found' })
 })
