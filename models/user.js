@@ -47,7 +47,7 @@ UserSchema.pre('save', function (next) {
 
 // Asynchronous method
 UserSchema.methods.validatePassword = function (password, callback) {
-  bcrypt.compare(password, this.password_hash).then(function (result) {
+  bcrypt.compare(password, this.password).then(function (result) {
     callback(result)
   })
 }

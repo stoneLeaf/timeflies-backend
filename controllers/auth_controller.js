@@ -1,5 +1,5 @@
 const passport = require('passport')
-const config = require('../config/secret')
+const config = require('../config')
 const jwt = require('jsonwebtoken')
 
 var AuthController = exports = module.exports = {}
@@ -8,7 +8,7 @@ var AuthController = exports = module.exports = {}
 // it allow separation of concerns
 AuthController.generateTokenForUser = function (user) {
   // TODO: jwt.sign() is synchronous, can it be a problem?
-  return jwt.sign({ email: user.profile.email }, config.secret)
+  return jwt.sign({ email: user.profile.email }, config.jwt_secret)
 }
 
 // Using a custom callback instead of authenticate() directly as a middleware
@@ -22,6 +22,8 @@ AuthController.login = function (req, res, next) {
       return res.status(401).json({ message: 'Bad email/password combination' })
     }
     // Sending JWT token
-    res.status(200).json({ token: this.generateTokenForUser(user) })
+    // FIXME: why do I have to reference exports and not 'this'?
+    //        something about the scope I don't understand
+    return res.status(200).json({ token: exports.generateTokenForUser(user) })
   })(req, res, next)
 }

@@ -1,22 +1,21 @@
 const express = require('express')
 const logger = require('./config/winston')
-const morgan = require('morgan')
+const config = require('./config')
 const mongoose = require('mongoose')
 
 const app = express()
 
-// Setting up Morgan with the 'dev' predefined format and Winston's stream
-app.use(morgan('dev', { stream: logger.stream }))
-
-if (process.env.NODE_ENV === 'production') {
-  mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true })
-} else {
-  mongoose.connect('mongodb://localhost:27017/timeflies', { useNewUrlParser: true })
+if (config.env === 'development') {
   mongoose.set('debug', true)
+
+  // Setting up Morgan with the 'dev' predefined format and Winston's stream
+  app.use(require('morgan')('dev', { stream: logger.stream }))
 }
 
 // To prevent deprecation warning of collection.ensureIndex
 mongoose.set('useCreateIndex', true)
+
+mongoose.connect(config.db_uri, { useNewUrlParser: true })
 
 var db = mongoose.connection
 
@@ -25,9 +24,7 @@ db.on('open', () => logger.info('MongoDB connection opened.'))
 // Handling global errors, might later want to do more than logging
 db.on('error', function (err) { logger.error(err.toString()) })
 
-require('./models/project')
-require('./models/activity')
-require('./models/user')
+require('./models')
 
 // Requests parsers
 app.use(express.json())

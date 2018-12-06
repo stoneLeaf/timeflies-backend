@@ -4,7 +4,7 @@ const ExtractJwt = require('passport-jwt').ExtractJwt
 const JWTStrategy = require('passport-jwt').Strategy
 const mongoose = require('mongoose')
 const User = mongoose.model('User')
-const config = require('./secret')
+const config = require('./index')
 
 passport.use(new LocalStrategy({ usernameField: 'email', session: false },
   function (email, password, done) {
@@ -20,7 +20,7 @@ passport.use(new LocalStrategy({ usernameField: 'email', session: false },
 
 passport.use(new JWTStrategy({
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: config.secret
+  secretOrKey: config.jwt_secret
 },
 function (jwtPayload, done) {
   User.findOne({ 'profile.email': jwtPayload.email }).then((user) => {
