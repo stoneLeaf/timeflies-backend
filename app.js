@@ -1,7 +1,3 @@
-
-// Environnement fallback
-process.env.NODE_ENV = process.env.NODE_ENV || 'development'
-
 const express = require('express')
 const logger = require('./config/winston')
 const morgan = require('morgan')
@@ -63,6 +59,4 @@ app.use(function (err, req, res, next) {
   }
 })
 
-var server = app.listen(process.env.PORT || 3000, function () {
-  logger.info('Listening on port ' + server.address().port)
-})
+module.exports = app
