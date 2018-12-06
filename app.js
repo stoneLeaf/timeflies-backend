@@ -30,7 +30,7 @@ db.on('open', () => logger.info('MongoDB connection opened.'))
 db.on('error', function (err) { logger.error(err.toString()) })
 
 require('./models/project')
-require('./models/record')
+require('./models/activity')
 require('./models/user')
 
 // Requests parsers

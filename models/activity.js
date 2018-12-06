@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-var RecordSchema = new Schema({
+var ActivitySchema = new Schema({
   startDate: {
     type: Date,
     required: true
@@ -14,4 +14,4 @@ var RecordSchema = new Schema({
   project: { type: Schema.Types.ObjectId, ref: 'Project', required: true }
 }, { timestamps: true })
 
-module.exports = mongoose.model('Record', RecordSchema)
+module.exports = mongoose.model('Activity', ActivitySchema)

@@ -29,6 +29,6 @@ ProjectSchema.pre('validate', function () {
 })
 
 // TODO: validate name and slug uniqueness in User scope
-// TODO: add pre/post remove middleware removing dependent records
+// TODO: add pre/post remove middleware removing dependent activities
 
 module.exports = mongoose.model('Project', ProjectSchema)

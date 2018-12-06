@@ -6,7 +6,7 @@ router.get('/ping', function (req, res, next) {
 
 router.use(require('./auth'))
 router.use(require('./users'))
-router.use(require('./records'))
+router.use(require('./activities'))
 router.use(require('./projects'))
 
 module.exports = router

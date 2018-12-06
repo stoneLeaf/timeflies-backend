@@ -52,6 +52,6 @@ UserSchema.methods.validatePassword = function (password, callback) {
   })
 }
 
-// TODO: add pre/post remove middleware removing dependent projects and records
+// TODO: add pre/post remove middleware removing dependent projects and activities
 
 module.exports = mongoose.model('User', UserSchema)
