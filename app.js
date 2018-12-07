@@ -1,32 +1,32 @@
 const express = require('express')
-const logger = require('./config/winston')
 const config = require('./config')
+const logger = require('./config/winston')
 const mongoose = require('mongoose')
 
 const app = express()
 
+// To prevent deprecation warning of collection.ensureIndex
+mongoose.set('useCreateIndex', true)
+
 if (config.env === 'development') {
   mongoose.set('debug', true)
 
-  // Setting up Morgan with the 'dev' predefined format and Winston's stream
+  // Logging HTTP requests with Morgan
   app.use(require('morgan')('dev', { stream: logger.stream }))
 }
-
-// To prevent deprecation warning of collection.ensureIndex
-mongoose.set('useCreateIndex', true)
 
 mongoose.connect(config.db_uri, { useNewUrlParser: true })
 
 var db = mongoose.connection
 
-// Logging open event
 db.on('open', () => logger.info('MongoDB connection opened.'))
 // Handling global errors, might later want to do more than logging
 db.on('error', function (err) { logger.error(err.toString()) })
 
+// Defining models
 require('./models')
 
-// Requests parsers
+// Mounting requests parsers
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -56,4 +56,7 @@ app.use(function (err, req, res, next) {
   }
 })
 
-module.exports = app
+module.exports = {
+  app: app,
+  db: db
+}
