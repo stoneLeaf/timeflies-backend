@@ -1,9 +1,10 @@
 const logger = require('winston')
+const config = require('./index')
 
 // Configuring the default Winston logger, that way any module can just
 // require the winston module directly to get the same instance
 logger.configure({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'silly',
+  level: config.log_level,
   format: logger.format.combine(
     logger.format.colorize(),
     logger.format.timestamp({
