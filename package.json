@@ -2,10 +2,10 @@
   "name": "timeflies-backend",
   "version": "0.1.0",
   "description": "TimeFlies Node.js backend",
-  "main": "server.js",
+  "main": "loader.js",
   "scripts": {
-    "start": "node ./server.js",
-    "dev": "NODE_ENV=development nodemon ./server.js",
+    "start": "node ./loader.js",
+    "dev": "NODE_ENV=development nodemon ./loader.js",
     "test": "mocha"
   },
   "repository": {
