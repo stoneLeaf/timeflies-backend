@@ -13,6 +13,6 @@ module.exports = {
    * @param {function} done Callback to invoke when the operation is complete.
    */
   resetDatabase: function (done) {
-    db.dropDatabase().then(function () { done() })
+    db.dropDatabase(done)
   }
 }

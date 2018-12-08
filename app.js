@@ -1,34 +1,17 @@
 const express = require('express')
-const config = require('./config')
 const logger = require('./config/winston')
-const mongoose = require('mongoose')
 
 const app = express()
 
-// To prevent deprecation warning of collection.ensureIndex
-mongoose.set('useCreateIndex', true)
-
-if (config.env === 'development') {
-  mongoose.set('debug', true)
-
-  // Logging HTTP requests with Morgan
-  app.use(require('morgan')('dev', { stream: logger.stream }))
-}
-
-mongoose.connect(config.db_uri, { useNewUrlParser: true })
-
-var db = mongoose.connection
-
-db.on('open', () => logger.info('MongoDB connection opened.'))
-// Handling global errors, might later want to do more than logging
-db.on('error', function (err) { logger.error(err.toString()) })
-
-// Defining models
-require('./models')
+// Logging HTTP requests with Morgan
+app.use(require('morgan')('dev', { stream: logger.stream }))
 
 // Mounting requests parsers
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+const db = require('./database')
+db.init(function () { app.emit('ready') })
 
 // Initializing passport
 const passport = require('passport')
