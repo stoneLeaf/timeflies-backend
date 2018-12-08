@@ -12,6 +12,10 @@ const { app, resetDatabase } = require('./server_interface')
 var requester = chai.request(app).keepOpen()
 
 describe('API integration tests for the user resource', function () {
+  before('Waiting for app to be ready', function (done) {
+    app.on('ready', function () { done() })
+  })
+
   after('Closing server', function (done) {
     requester.close()
     done()
