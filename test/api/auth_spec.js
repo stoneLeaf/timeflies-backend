@@ -3,7 +3,7 @@ const chaiHttp = require('chai-http')
 const expect = chai.expect
 
 const factories = require('./factories')
-const { expectFailedValidationResponse } = require('./helpers')
+const { createUser, expectFailedValidationResponse } = require('./helpers')
 const { app, readyCallback, resetDatabase } = require('./server_interface')
 
 chai.use(chaiHttp)
@@ -61,6 +61,7 @@ describe('API integration tests for authentication', function () {
     })
 
     it('Should return the user profile and a token', function (done) {
+      createUser(requester).catch(function (err) { done(err) })
       let params = factories.validLoginParams()
       requester.post(endpoint).send(params)
         .then(function (res) {

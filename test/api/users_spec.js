@@ -3,12 +3,12 @@ const chaiHttp = require('chai-http')
 const expect = chai.expect
 
 const factories = require('./factories')
-const { expectFailedValidationResponse } = require('./helpers')
-
-chai.use(chaiHttp)
-
+const { createUserEndpoint, createUser,
+  expectFailedValidationResponse } = require('./helpers')
 // Accessing the app through an implementation-agnostic interface
 const { app, readyCallback, resetDatabase } = require('./server_interface')
+
+chai.use(chaiHttp)
 
 describe('API integration tests for the user resource', function () {
   // Keeping the connection open for multiple requests
@@ -24,7 +24,7 @@ describe('API integration tests for the user resource', function () {
   })
 
   describe('POST /users (User registration)', function () {
-    let endpoint = '/api/users'
+    let endpoint = createUserEndpoint
 
     describe('Validation', function () {
       function expectRejectedParams (params, done) {
@@ -76,18 +76,14 @@ describe('API integration tests for the user resource', function () {
       })
 
       it('Should enforce email uniqueness', function (done) {
-        let params = factories.validRegistrationParams()
-        // Registering a user
-        requester.post(endpoint).send(params)
-          .then(function (res) {
-            expect(res).to.be.json
-            expect(res).to.have.status(200)
-          })
-          .then(function () {
-            // Trying to register again with the same email
-            expectRejectedParams(params, done)
-          })
-          .catch(function (err) { done(err) })
+        // Registering a valid user
+        createUser(requester).then(function (res) {
+          expect(res).to.be.json
+          expect(res).to.have.status(200)
+        }).then(function () {
+          // Trying to register again with the same email
+          expectRejectedParams(factories.validRegistrationParams(), done)
+        }).catch(function (err) { done(err) })
       })
     })
 
@@ -97,15 +93,13 @@ describe('API integration tests for the user resource', function () {
       })
 
       it('Should return the user profile and a token', function (done) {
-        let params = factories.validRegistrationParams()
-        requester.post(endpoint).send(params)
-          .then(function (res) {
-            expect(res).to.be.json
-            expect(res).to.have.status(200)
-            expect(res.body).to.have.property('profile')
-            expect(res.body).to.have.property('token')
-            done()
-          }).catch(function (err) { done(err) })
+        createUser(requester).then(function (res) {
+          expect(res).to.be.json
+          expect(res).to.have.status(200)
+          expect(res.body).to.have.property('profile')
+          expect(res.body).to.have.property('token')
+          done()
+        }).catch(function (err) { done(err) })
       })
     })
   })
