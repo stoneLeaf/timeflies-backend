@@ -1,6 +1,12 @@
 const config = require('./config')
 const { app } = require('./app')
 
-app.on('ready', function () {
+function load () {
   app.listen(config.port)
-})
+}
+
+if (app.isReady) {
+  load()
+} else {
+  app.on('ready', function () { load() })
+}

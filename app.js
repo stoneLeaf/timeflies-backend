@@ -10,6 +10,8 @@ app.use(require('morgan')('dev', { stream: logger.stream }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+app.on('ready', function () { app.isReady = true })
+
 const db = require('./database')
 db.init(function () { app.emit('ready') })
 
