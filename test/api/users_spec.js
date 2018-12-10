@@ -1,19 +1,21 @@
 const chai = require('chai')
 const chaiHttp = require('chai-http')
 const expect = chai.expect
-const factories = require('../factories')
+
+const factories = require('./factories')
+const { expectFailedValidationResponse } = require('./helpers')
 
 chai.use(chaiHttp)
 
 // Accessing the app through an implementation-agnostic interface
-const { app, resetDatabase } = require('./server_interface')
-
-// Keeping the connection open for multiple requests
-var requester = chai.request(app).keepOpen()
+const { app, readyCallback, resetDatabase } = require('./server_interface')
 
 describe('API integration tests for the user resource', function () {
+  // Keeping the connection open for multiple requests
+  let requester = chai.request(app).keepOpen()
+
   before('Waiting for app to be ready', function (done) {
-    app.on('ready', function () { done() })
+    readyCallback(done)
   })
 
   after('Closing server', function (done) {
@@ -28,9 +30,7 @@ describe('API integration tests for the user resource', function () {
       function expectRejectedParams (params, done) {
         requester.post(endpoint).send(params)
           .then(function (res) {
-            expect(res).to.be.json
-            expect(res).to.have.status(422)
-            expect(res.body).to.have.property('errors')
+            expectFailedValidationResponse(res)
             done()
           }).catch(function (err) { done(err) })
       }
@@ -44,31 +44,37 @@ describe('API integration tests for the user resource', function () {
         delete params.email
         expectRejectedParams(params, done)
       })
+
       it('Should require a valid email', function (done) {
         let params = factories.validRegistrationParams()
         params.email = 'invalid'
         expectRejectedParams(params, done)
       })
+
       it('Should require a password', function (done) {
         let params = factories.validRegistrationParams()
         delete params.password
         expectRejectedParams(params, done)
       })
+
       it('Should require a password of minimum 10 characters', function (done) {
         let params = factories.validRegistrationParams()
         params.password = 'failing'
         expectRejectedParams(params, done)
       })
+
       it('Should require a password of maximum 128 characters', function (done) {
         let params = factories.validRegistrationParams()
-        params.password = 'failing'
+        params.password = 'f'.repeat(129)
         expectRejectedParams(params, done)
       })
+
       it('Should reject passwords containing spaces', function (done) {
         let params = factories.validRegistrationParams()
         params.password = 'not valid'
         expectRejectedParams(params, done)
       })
+
       it('Should enforce email uniqueness', function (done) {
         let params = factories.validRegistrationParams()
         // Registering a user
@@ -79,7 +85,6 @@ describe('API integration tests for the user resource', function () {
           })
           .then(function () {
             // Trying to register again with the same email
-            // TODO: but it could also be rejected for another reason like rate limit
             expectRejectedParams(params, done)
           })
           .catch(function (err) { done(err) })
