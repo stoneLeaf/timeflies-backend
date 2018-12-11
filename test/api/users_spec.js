@@ -17,93 +17,90 @@ describe('API integration tests for the user resource', function () {
   let requester = chai.request(app).keepOpen()
   let token
 
-  before('Waiting for app to be ready', function (done) {
-    readyCallback(done)
+  before('Waiting for app to be ready', function () {
+    return readyCallback()
   })
 
-  after('Closing server', function (done) {
-    requester.close()
-    done()
+  after('Closing server', function () {
+    return requester.close()
   })
 
   describe('POST /users (User registration)', function () {
     let endpoint = createUserEndpoint
 
     describe('Validation', function () {
-      function expectRejectedParams (params, done) {
-        requester.post(endpoint).send(params)
+      function expectRejectedParams (params) {
+        return requester.post(endpoint).send(params)
           .then(function (res) {
             expectFailedValidationResponse(res)
-            done()
-          }).catch(function (err) { done(err) })
+          })
       }
 
-      before('Resetting database', function (done) {
-        resetDatabase(done)
+      before('Resetting database', function () {
+        return resetDatabase()
       })
 
-      it('Should require an email', function (done) {
+      it('Should require an email', function () {
         let params = factories.validRegistrationParams()
         delete params.email
-        expectRejectedParams(params, done)
+        return expectRejectedParams(params)
       })
 
-      it('Should require a valid email', function (done) {
+      it('Should require a valid email', function () {
         let params = factories.validRegistrationParams()
         params.email = 'invalid'
-        expectRejectedParams(params, done)
+        return expectRejectedParams(params)
       })
 
-      it('Should require a password', function (done) {
+      it('Should require a password', function () {
         let params = factories.validRegistrationParams()
         delete params.password
-        expectRejectedParams(params, done)
+        return expectRejectedParams(params)
       })
 
-      it('Should require a password of minimum 10 characters', function (done) {
+      it('Should require a password of minimum 10 characters', function () {
         let params = factories.validRegistrationParams()
         params.password = 'failing'
-        expectRejectedParams(params, done)
+        return expectRejectedParams(params)
       })
 
-      it('Should require a password of maximum 128 characters', function (done) {
+      it('Should require a password of maximum 128 characters', function () {
         let params = factories.validRegistrationParams()
         params.password = 'f'.repeat(129)
-        expectRejectedParams(params, done)
+        return expectRejectedParams(params)
       })
 
-      it('Should reject passwords containing spaces', function (done) {
+      it('Should reject passwords containing spaces', function () {
         let params = factories.validRegistrationParams()
         params.password = 'not valid'
-        expectRejectedParams(params, done)
+        return expectRejectedParams(params)
       })
 
-      it('Should enforce email uniqueness', function (done) {
+      it('Should enforce email uniqueness', function () {
         // Registering a valid user
-        createUser(requester).then(function (res) {
+        return createUser(requester).then(function (res) {
           expect(res).to.be.json
           expect(res).to.have.status(200)
         }).then(function () {
           // Trying to register again with the same email
-          expectRejectedParams(factories.validRegistrationParams(), done)
-        }).catch(function (err) { done(err) })
+          return expectRejectedParams(factories.validRegistrationParams())
+        })
       })
     })
 
     describe('Output', function () {
-      before('Resetting database', function (done) {
-        resetDatabase(done)
+      before('Resetting database', function () {
+        return resetDatabase()
       })
 
-      it('Should return the user profile and a token', function (done) {
-        createUser(requester).then(function (res) {
+      it('Should return the user profile and a token', function () {
+        return createUser(requester).then(function (res) {
           expect(res).to.be.json
           expect(res).to.have.status(200)
           expect(res.body).to.have.property('profile')
           expect(res.body).to.have.property('token')
           token = res.body.token
-          done()
-        }).catch(function (err) { done(err) })
+        })
       })
     })
   })
@@ -111,14 +108,13 @@ describe('API integration tests for the user resource', function () {
   describe('GET /profile (Get current user profile)', function () {
     let endpoint = userProfileEndpoint
 
-    it('Should return the current user profile', function (done) {
-      setAuthHeader(requester.get(endpoint), token)
+    it('Should return the current user profile', function () {
+      return setAuthHeader(requester.get(endpoint), token)
         .send().then(function (res) {
           expect(res).to.be.json
           expect(res).to.have.status(200)
           expect(res.body).to.have.property('profile')
-          done()
-        }).catch(function (err) { done(err) })
+        })
     })
   })
 })

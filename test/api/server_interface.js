@@ -8,24 +8,22 @@ module.exports = {
   app: app,
 
   /**
-   * Callback used before any test to unsure the app is ready.
-   *
-   * @param {function} done Callback to invoke when the app is ready.
+   * Promise called before any test to unsure the app is ready.
    */
-  readyCallback: function (done) {
-    if (app.isReady) {
-      done()
-    } else {
-      app.on('ready', function () { done() })
-    }
+  readyCallback: function () {
+    return new Promise(function (resolve) {
+      if (app.isReady) {
+        resolve()
+      } else {
+        app.on('ready', function () { resolve() })
+      }
+    })
   },
 
   /**
-   * Must reset the database for further tests.
-   *
-   * @param {function} done Callback to invoke when the operation is complete.
+   * Promise-based database reset.
    */
-  resetDatabase: function (done) {
-    db.dropDatabase(done)
+  resetDatabase: function () {
+    return db.dropDatabase()
   }
 }

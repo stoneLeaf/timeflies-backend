@@ -16,74 +16,69 @@ describe('API integration tests for authentication', function () {
   let requester = chai.request(app).keepOpen()
   let token
 
-  before('Waiting for app to be ready', function (done) {
-    readyCallback(done)
+  before('Waiting for app to be ready', function () {
+    return readyCallback()
   })
 
-  after('Closing server', function (done) {
-    requester.close()
-    done()
+  after('Closing server', function () {
+    return requester.close()
   })
 
   describe('POST /auth (Authenticate)', function () {
     let endpoint = '/api/auth'
 
-    function expectRejectedParams (params, done) {
-      requester.post(endpoint).send(params)
+    function expectRejectedParams (params) {
+      return requester.post(endpoint).send(params)
         .then(function (res) {
           expectFailedValidationResponse(res)
-          done()
-        }).catch(function (err) { done(err) })
+        })
     }
 
-    before('Resetting database', function (done) {
-      resetDatabase(done)
+    before('Resetting database', function () {
+      return resetDatabase()
     })
 
-    it('Should require an email', function (done) {
+    it('Should require an email', function () {
       let params = factories.validLoginParams()
       delete params.email
-      expectRejectedParams(params, done)
+      return expectRejectedParams(params)
     })
 
-    it('Should require a password', function (done) {
+    it('Should require a password', function () {
       let params = factories.validLoginParams()
       delete params.password
-      expectRejectedParams(params, done)
+      return expectRejectedParams(params)
     })
 
-    it('Should reject invalid credentials', function (done) {
+    it('Should reject invalid credentials', function () {
       let params = factories.validLoginParams()
       params.email = 'not@registered'
-      requester.post(endpoint).send(params)
+      return requester.post(endpoint).send(params)
         .then(function (res) {
           expect(res).to.be.json
           expect(res).to.have.status(401)
           expect(res.body).to.have.property('errors')
-          done()
-        }).catch(function (err) { done(err) })
+        })
     })
 
-    it('Should return the user profile and a token', function (done) {
-      createUser(requester).then(function () {
-        requester.post(endpoint).send(factories.validLoginParams())
+    it('Should return the user profile and a token', function () {
+      return createUser(requester).then(function () {
+        return requester.post(endpoint).send(factories.validLoginParams())
           .then(function (res) {
             expect(res).to.be.json
             expect(res).to.have.status(200)
             expect(res.body).to.have.property('profile')
             expect(res.body).to.have.property('token')
             token = res.body.token
-            done()
           })
-      }).catch(function (err) { done(err) })
+      })
     })
 
-    it('Should return a valid token', function (done) {
-      setAuthHeader(requester.get(userProfileEndpoint), token)
+    it('Should return a valid token', function () {
+      return setAuthHeader(requester.get(userProfileEndpoint), token)
         .send().then(function (res) {
           expect(res).to.have.status(200)
-          done()
-        }).catch(function (err) { done(err) })
+        })
     })
   })
 })

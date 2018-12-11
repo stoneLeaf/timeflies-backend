@@ -22,7 +22,7 @@ module.exports = {
     mongoose.connect(config.db_uri, { useNewUrlParser: true })
       .then(function () { done() })
   },
-  dropDatabase: function (done) {
-    this.connection.dropDatabase(done)
+  dropDatabase: function () {
+    return this.connection.dropDatabase()
   }
 }

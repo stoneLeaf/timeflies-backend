@@ -7,11 +7,8 @@ var Helpers = module.exports = {}
 Helpers.createUserEndpoint = '/api/users'
 
 Helpers.createUser = function (requester) {
-  return new Promise(function (resolve, reject) {
-    requester.post(Helpers.createUserEndpoint)
-      .send(factories.validRegistrationParams())
-      .then(function (res) { resolve(res) }).catch(err => reject(err))
-  })
+  return requester.post(Helpers.createUserEndpoint)
+    .send(factories.validRegistrationParams())
 }
 
 Helpers.userProfileEndpoint = '/api/profile'
