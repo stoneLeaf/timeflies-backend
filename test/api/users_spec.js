@@ -4,6 +4,8 @@ const expect = chai.expect
 
 const factories = require('./factories')
 const { createUserEndpoint, createUser,
+  userProfileEndpoint,
+  setAuthHeader,
   expectFailedValidationResponse } = require('./helpers')
 // Accessing the app through an implementation-agnostic interface
 const { app, readyCallback, resetDatabase } = require('./server_interface')
@@ -13,6 +15,7 @@ chai.use(chaiHttp)
 describe('API integration tests for the user resource', function () {
   // Keeping the connection open for multiple requests
   let requester = chai.request(app).keepOpen()
+  let token
 
   before('Waiting for app to be ready', function (done) {
     readyCallback(done)
@@ -98,9 +101,24 @@ describe('API integration tests for the user resource', function () {
           expect(res).to.have.status(200)
           expect(res.body).to.have.property('profile')
           expect(res.body).to.have.property('token')
+          token = res.body.token
           done()
         }).catch(function (err) { done(err) })
       })
+    })
+  })
+
+  describe('GET /profile (Get current user profile)', function () {
+    let endpoint = userProfileEndpoint
+
+    it('Should return the current user profile', function (done) {
+      setAuthHeader(requester.post(endpoint), token)
+        .send().then(function (res) {
+          expect(res).to.be.json
+          expect(res).to.have.status(200)
+          expect(res.body).to.have.property('profile')
+          done()
+        }).catch(function (err) { done(err) })
     })
   })
 })

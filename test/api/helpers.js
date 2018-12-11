@@ -14,6 +14,12 @@ Helpers.createUser = function (requester) {
   })
 }
 
+Helpers.userProfileEndpoint = '/api/profile'
+
+Helpers.setAuthHeader = function (requester, token) {
+  return requester.set('Authorization', `Bearer ${token}`)
+}
+
 Helpers.expectFailedValidationResponse = function (res) {
   expect(res).to.be.json
   expect(res).to.have.status(422)
