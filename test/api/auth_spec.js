@@ -3,7 +3,10 @@ const chaiHttp = require('chai-http')
 const expect = chai.expect
 
 const factories = require('./factories')
-const { createUser, expectFailedValidationResponse } = require('./helpers')
+const { createUser,
+  userProfileEndpoint,
+  setAuthHeader,
+  expectFailedValidationResponse } = require('./helpers')
 const { app, readyCallback, resetDatabase } = require('./server_interface')
 
 chai.use(chaiHttp)
@@ -11,6 +14,7 @@ chai.use(chaiHttp)
 describe('API integration tests for authentication', function () {
   // Keeping the connection open for multiple requests
   let requester = chai.request(app).keepOpen()
+  let token
 
   before('Waiting for app to be ready', function (done) {
     readyCallback(done)
@@ -61,14 +65,23 @@ describe('API integration tests for authentication', function () {
     })
 
     it('Should return the user profile and a token', function (done) {
-      createUser(requester).catch(function (err) { done(err) })
-      let params = factories.validLoginParams()
-      requester.post(endpoint).send(params)
-        .then(function (res) {
-          expect(res).to.be.json
+      createUser(requester).then(function () {
+        requester.post(endpoint).send(factories.validLoginParams())
+          .then(function (res) {
+            expect(res).to.be.json
+            expect(res).to.have.status(200)
+            expect(res.body).to.have.property('profile')
+            expect(res.body).to.have.property('token')
+            token = res.body.token
+            done()
+          })
+      }).catch(function (err) { done(err) })
+    })
+
+    it('Should return a valid token', function (done) {
+      setAuthHeader(requester.post(userProfileEndpoint), token)
+        .send().then(function (res) {
           expect(res).to.have.status(200)
-          expect(res.body).to.have.property('profile')
-          expect(res.body).to.have.property('token')
           done()
         }).catch(function (err) { done(err) })
     })
