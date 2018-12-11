@@ -16,3 +16,7 @@ UsersController.create = function (req, res, next) {
     })
   }).catch((err) => { next(err) })
 }
+
+UsersController.getProfile = function (req, res, next) {
+  res.json({ profile: req.user.profile })
+}
