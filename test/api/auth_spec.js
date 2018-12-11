@@ -79,7 +79,7 @@ describe('API integration tests for authentication', function () {
     })
 
     it('Should return a valid token', function (done) {
-      setAuthHeader(requester.post(userProfileEndpoint), token)
+      setAuthHeader(requester.get(userProfileEndpoint), token)
         .send().then(function (res) {
           expect(res).to.have.status(200)
           done()

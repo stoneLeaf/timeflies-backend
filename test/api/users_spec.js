@@ -112,7 +112,7 @@ describe('API integration tests for the user resource', function () {
     let endpoint = userProfileEndpoint
 
     it('Should return the current user profile', function (done) {
-      setAuthHeader(requester.post(endpoint), token)
+      setAuthHeader(requester.get(endpoint), token)
         .send().then(function (res) {
           expect(res).to.be.json
           expect(res).to.have.status(200)
