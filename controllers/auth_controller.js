@@ -17,13 +17,17 @@ AuthController.login = function (req, res, next) {
   // Does not support promises
   passport.authenticate('local', { session: false }, function (err, user, info) {
     if (err) return next(err)
+    // TODO: this message is unfortunately hard-coded in passport-local
+    if (info && info.message === 'Missing credentials') {
+      return res.status(422).json({ errors: 'An email and a password is required' })
+    }
     if (!user) {
       // Customized
-      return res.status(401).json({ message: 'Bad email/password combination' })
+      return res.status(401).json({ errors: 'Bad email/password combination' })
     }
     // Sending JWT token
-    // FIXME: why do I have to reference exports and not 'this'?
-    //        something about the scope I don't understand
-    return res.status(200).json({ token: exports.generateTokenForUser(user) })
+    return res.status(200).json({
+      profile: user.profile,
+      token: AuthController.generateTokenForUser(user) })
   })(req, res, next)
 }
