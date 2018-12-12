@@ -10,7 +10,7 @@ router.get('/projects', function (req, res, next) {
 
 router.post('/projects', auth.required, ProjectsController.create)
 
-router.get('/projects/:project_id', ProjectsController.read)
+router.get('/projects/:project_id', auth.required, ProjectsController.getById)
 
 router.get('/projects/:project_id/activities', function (req, res, next) {
   res.status(200).json({ debug: 'projects id ' + req.params.project_id + ' activities' })

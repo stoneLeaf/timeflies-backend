@@ -1,17 +1,20 @@
 const mongoose = require('mongoose')
 const Project = mongoose.model('Project')
-const User = mongoose.model('User')
 
 var ProjectsController = exports = module.exports = {}
 
 ProjectsController.setProjectOnParam = function (req, res, next, value, name) {
   Project.findById(value).exec().then(function (project) {
-    req.project = project
-    if (!req.project) next(new Error('Project not found'))
+    if (!project) throw new Error('Not found')
+    req.project = project.toObject()
+    project.id = project._id
     next()
   }).catch((err) => {
-    if (err.name === 'CastError') next(new Error('Project id invalid'))
-    else next(err)
+    if (err.name === 'CastError' || err.message === 'Not found') {
+      res.status(404).json({ errors: 'Project not found' })
+    } else {
+      next(err)
+    }
   })
 }
 
@@ -29,9 +32,11 @@ ProjectsController.create = function (req, res, next) {
   }).catch((err) => { next(err) })
 }
 
-ProjectsController.read = function (req, res, next) {
-  Project.findById(req.project._id).populate('owner').exec()
-    .then(function (project) {
-      res.status(200).json(project)
-    }).catch((err) => { next(err) })
+ProjectsController.getById = function (req, res, next) {
+  if (req.user._id.toString() !== req.project.owner.toString()) {
+    res.status(403).json({ errors: 'Access denied' })
+  } else {
+    req.project.id = req.project._id
+    res.status(200).json({ project: req.project })
+  }
 }
