@@ -42,3 +42,17 @@ module.exports.venusProjectParams = function () {
     description: 'Planet resources'
   }
 }
+
+module.exports.firstActivityParams = function () {
+  return {
+    startDate: (new Date()).toJSON(),
+    description: 'Getting started'
+  }
+}
+
+module.exports.secondActivityParams = function () {
+  return {
+    startDate: (new Date()).toJSON(),
+    description: 'Keeping up'
+  }
+}
