@@ -16,15 +16,17 @@ ProjectsController.setProjectOnParam = function (req, res, next, value, name) {
 }
 
 ProjectsController.create = function (req, res, next) {
-  // TODO: owner should be the current logged in user
-  User.findOne().exec().then(function (owner) {
-    // Fail safe, logged in user should always exists
-    if (!owner) throw new Error('Owner not found')
-    req.body.owner = owner._id
-    new Project(req.body).save().then(function (project) {
-      res.status(200).json(project)
-    }).catch((err) => { next(err) })
-  })
+  req.body.owner = req.user._id
+  new Project(req.body).save().then(function (project) {
+    // mongoose documents don't allow property modifications
+    // TODO: make instead a filter transforming the doc into a public object
+    //       with only chosen properties
+    project = project.toObject()
+    project.id = project._id
+    // TODO: the URI should not be hard-coded
+    res.status(201).set('location', `/api/projects/${project.id}`)
+      .json({ project: project })
+  }).catch((err) => { next(err) })
 }
 
 ProjectsController.read = function (req, res, next) {

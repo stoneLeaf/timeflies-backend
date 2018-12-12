@@ -7,11 +7,10 @@ var ProjectSchema = new Schema({
     type: String,
     required: true,
     minlength: 2,
-    maxlength: 160
+    maxlength: 100
   },
   slug: {
     type: String,
-    required: true,
     lowercase: true,
     minlength: 2,
     maxlength: 70
@@ -25,7 +24,7 @@ var ProjectSchema = new Schema({
 }, { timestamps: true })
 
 ProjectSchema.pre('validate', function () {
-  if (this.name) this.slug = slugify(this.name, { lower: true })
+  if (this.name) this.slug = slugify(this.name, { lower: true }).substr(0, 70)
 })
 
 // TODO: validate name and slug uniqueness in User scope
