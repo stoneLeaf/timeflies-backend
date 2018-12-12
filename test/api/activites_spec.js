@@ -52,7 +52,7 @@ describe('API integration tests for the \'activity\' resource', function () {
   })
 
   describe('POST /projects/:id/activities (Create activity)', function () {
-    let endpoint = `/api/projects/${ceresProjectId}/activities`
+    let endpoint
 
     function expectRejectedParams (params) {
       return setAuthHeader(requester.post(endpoint), userAlphaToken)
@@ -60,6 +60,10 @@ describe('API integration tests for the \'activity\' resource', function () {
           expectFailedValidationResponse(res)
         })
     }
+
+    before('Setting endpoint', function () {
+      endpoint = `/api/projects/${ceresProjectId}/activities`
+    })
 
     it('Should require a start date', function () {
       let params = factories.firstActivityParams()
@@ -111,7 +115,11 @@ describe('API integration tests for the \'activity\' resource', function () {
   })
 
   describe('PATCH /activities/:id (Update activity by id)', function () {
-    let endpoint = `${commonEndpoint}/${firstActivityId}`
+    let endpoint
+
+    before('Setting endpoint', function () {
+      endpoint = `${commonEndpoint}/${firstActivityId}`
+    })
 
     it('Should be denied to all users other than the owner', function () {
       let params = {}
@@ -176,7 +184,11 @@ describe('API integration tests for the \'activity\' resource', function () {
   })
 
   describe('GET /activities/:id (Get activity by id)', function () {
-    let endpoint = `${commonEndpoint}/${firstActivityId}`
+    let endpoint
+
+    before('Setting endpoint', function () {
+      endpoint = `${commonEndpoint}/${firstActivityId}`
+    })
 
     it('Should only be accessible to the parent user', function () {
       return setAuthHeader(requester.get(endpoint), userBetaToken)
@@ -204,7 +216,11 @@ describe('API integration tests for the \'activity\' resource', function () {
   })
 
   describe('DELETE /activities/:id (Delete activity by id)', function () {
-    let endpoint = `${commonEndpoint}/${firstActivityId}`
+    let endpoint
+
+    before('Setting endpoint', function () {
+      endpoint = `${commonEndpoint}/${firstActivityId}`
+    })
 
     it('Should be denied to all users other than the parent user', function () {
       return setAuthHeader(requester.delete(endpoint), userBetaToken).send()

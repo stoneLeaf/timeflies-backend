@@ -113,7 +113,11 @@ describe('API integration tests for the \'project\' resource', function () {
   })
 
   describe('GET /projects/:id (Get project by id)', function () {
-    let endpoint = `${commonEndpoint}/${ceresProjectId}`
+    let endpoint
+
+    before('Setting endpoint', function () {
+      endpoint = `${commonEndpoint}/${ceresProjectId}`
+    })
 
     it('Should only be accessible to the project owner', function () {
       return setAuthHeader(requester.get(endpoint), userBetaToken)
@@ -144,7 +148,11 @@ describe('API integration tests for the \'project\' resource', function () {
   })
 
   describe('PATCH /projects/:id (Update project by id)', function () {
-    let endpoint = `${commonEndpoint}/${ceresProjectId}`
+    let endpoint
+
+    before('Setting endpoint', function () {
+      endpoint = `${commonEndpoint}/${ceresProjectId}`
+    })
 
     /**
      * Note: Validation is only tested in resource creation as usually the same
@@ -191,7 +199,11 @@ describe('API integration tests for the \'project\' resource', function () {
   })
 
   describe('DELETE /projects/:id (Delete project by id)', function () {
-    let endpoint = `${commonEndpoint}/${ceresProjectId}`
+    let endpoint
+
+    before('Setting endpoint', function () {
+      endpoint = `${commonEndpoint}/${ceresProjectId}`
+    })
 
     it('Should be denied to all users other than the owner', function () {
       return setAuthHeader(requester.delete(endpoint), userBetaToken).send()
