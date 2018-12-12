@@ -3,7 +3,7 @@ const chaiHttp = require('chai-http')
 const expect = chai.expect
 
 const factories = require('./factories')
-const { createUserEndpoint, createUser,
+const { createUserEndpoint, createUserAlpha,
   userProfileEndpoint,
   setAuthHeader,
   expectFailedValidationResponse } = require('./helpers')
@@ -15,7 +15,7 @@ chai.use(chaiHttp)
 describe('API integration tests for the user resource', function () {
   // Keeping the connection open for multiple requests
   let requester = chai.request(app).keepOpen()
-  let token
+  let userAlphaToken
 
   before('Waiting for app to be ready', function () {
     return readyCallback()
@@ -41,49 +41,49 @@ describe('API integration tests for the user resource', function () {
       })
 
       it('Should require an email', function () {
-        let params = factories.validRegistrationParams()
+        let params = factories.alphaRegistrationParams()
         delete params.email
         return expectRejectedParams(params)
       })
 
       it('Should require a valid email', function () {
-        let params = factories.validRegistrationParams()
+        let params = factories.alphaRegistrationParams()
         params.email = 'invalid'
         return expectRejectedParams(params)
       })
 
       it('Should require a password', function () {
-        let params = factories.validRegistrationParams()
+        let params = factories.alphaRegistrationParams()
         delete params.password
         return expectRejectedParams(params)
       })
 
       it('Should require a password of minimum 10 characters', function () {
-        let params = factories.validRegistrationParams()
+        let params = factories.alphaRegistrationParams()
         params.password = 'failing'
         return expectRejectedParams(params)
       })
 
       it('Should require a password of maximum 128 characters', function () {
-        let params = factories.validRegistrationParams()
+        let params = factories.alphaRegistrationParams()
         params.password = 'f'.repeat(129)
         return expectRejectedParams(params)
       })
 
       it('Should reject passwords containing spaces', function () {
-        let params = factories.validRegistrationParams()
+        let params = factories.alphaRegistrationParams()
         params.password = 'not valid'
         return expectRejectedParams(params)
       })
 
       it('Should enforce email uniqueness', function () {
         // Registering a valid user
-        return createUser(requester).then(function (res) {
+        return createUserAlpha(requester).then(function (res) {
           expect(res).to.be.json
           expect(res).to.have.status(200)
         }).then(function () {
           // Trying to register again with the same email
-          return expectRejectedParams(factories.validRegistrationParams())
+          return expectRejectedParams(factories.alphaRegistrationParams())
         })
       })
     })
@@ -94,12 +94,12 @@ describe('API integration tests for the user resource', function () {
       })
 
       it('Should return the user profile and a token', function () {
-        return createUser(requester).then(function (res) {
+        return createUserAlpha(requester).then(function (res) {
           expect(res).to.be.json
           expect(res).to.have.status(200)
           expect(res.body).to.have.property('profile')
           expect(res.body).to.have.property('token')
-          token = res.body.token
+          userAlphaToken = res.body.token
         })
       })
     })
@@ -109,7 +109,7 @@ describe('API integration tests for the user resource', function () {
     let endpoint = userProfileEndpoint
 
     it('Should return the current user profile', function () {
-      return setAuthHeader(requester.get(endpoint), token)
+      return setAuthHeader(requester.get(endpoint), userAlphaToken)
         .send().then(function (res) {
           expect(res).to.be.json
           expect(res).to.have.status(200)

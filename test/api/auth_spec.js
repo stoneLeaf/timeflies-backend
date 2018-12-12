@@ -3,7 +3,7 @@ const chaiHttp = require('chai-http')
 const expect = chai.expect
 
 const factories = require('./factories')
-const { createUser,
+const { createUserAlpha,
   userProfileEndpoint,
   setAuthHeader,
   expectFailedValidationResponse } = require('./helpers')
@@ -14,7 +14,7 @@ chai.use(chaiHttp)
 describe('API integration tests for authentication', function () {
   // Keeping the connection open for multiple requests
   let requester = chai.request(app).keepOpen()
-  let token
+  let userAlphaToken
 
   before('Waiting for app to be ready', function () {
     return readyCallback()
@@ -39,19 +39,19 @@ describe('API integration tests for authentication', function () {
     })
 
     it('Should require an email', function () {
-      let params = factories.validLoginParams()
+      let params = factories.alphaLoginParams()
       delete params.email
       return expectRejectedParams(params)
     })
 
     it('Should require a password', function () {
-      let params = factories.validLoginParams()
+      let params = factories.alphaLoginParams()
       delete params.password
       return expectRejectedParams(params)
     })
 
     it('Should reject invalid credentials', function () {
-      let params = factories.validLoginParams()
+      let params = factories.alphaLoginParams()
       params.email = 'not@registered'
       return requester.post(endpoint).send(params)
         .then(function (res) {
@@ -62,20 +62,21 @@ describe('API integration tests for authentication', function () {
     })
 
     it('Should return the user profile and a token', function () {
-      return createUser(requester).then(function () {
-        return requester.post(endpoint).send(factories.validLoginParams())
+      return createUserAlpha(requester).then(function () {
+        return requester.post(endpoint).send(factories.alphaLoginParams())
           .then(function (res) {
             expect(res).to.be.json
             expect(res).to.have.status(200)
             expect(res.body).to.have.property('profile')
             expect(res.body).to.have.property('token')
-            token = res.body.token
+            userAlphaToken = res.body.token
           })
       })
     })
 
     it('Should return a valid token', function () {
-      return setAuthHeader(requester.get(userProfileEndpoint), token)
+      // TODO: not so great to rely on a random endpoint?
+      return setAuthHeader(requester.get(userProfileEndpoint), userAlphaToken)
         .send().then(function (res) {
           expect(res).to.have.status(200)
         })

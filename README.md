@@ -6,7 +6,7 @@ TimeFlies Node.js backend.
 
 TimeFlies is a time tracking app coded for the sole purpose of learning.
 
-## Development
+## Development journal
 
 As with my [coding journey](https://github.com/stoneLeaf/coding-journey), I will try to lay out my chain of thoughts and progress, adding insights to the commit history.
 
@@ -97,3 +97,9 @@ All the efforts made to set up my [TDD](https://en.wikipedia.org/wiki/Test-drive
 I continued to try as much as possible to DRY my tests. For instance I exported the authentication header check in my helper, as well as the request to create a new user as it is used in several places. The result looked not so great and organized, but it was good enough at that point. I also fully switched to [promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) in my tests, and in the way gained a *much better* understanding of the logic, especially when chaining. Being the underlying concepts behind the [async/await](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) [syntactic sugar](https://en.wikipedia.org/wiki/Syntactic_sugar), I was really glad I took the time to work on them.
 
 It would have been all too good if I hadn't been confronted with a new challenge soon after. As I started to efficiently write the API specs for the 'project' resource, I wanted to assert that a user could not update a project he wasn't the owner of. For that matter, I needed a project in the database created by a different user than the one authenticated to test it against. I could have created a new user using the API, stored its token, perform a project creation with it, and then do the update test with the first user token. But it felt overly complicated, especially since I would have to do it for other resources.
+
+### Keeping focus
+
+I investigated the use of [factories](https://github.com/rosiejs/rosie) or [fixtures](https://en.wikipedia.org/wiki/Test_fixture#Software), as I had used some during my modest [Rails](https://rubyonrails.org/) experience. The problem was that if I started to go around the API endpoints to handle models and database directly, then these integration tests wouldn't be fully [implementation-agnostic](https://stackoverflow.com/questions/10969057/what-does-implementation-agnostic-mean) anymore. Also, it was important that I stayed focus on the end goal of producing a working API in a reasonable time frame. I would certainly have plenty of opportunities to practice these concepts later anyway.
+
+So I went and tried the solution I saw as overly complicated a day before. And it panned out just fine, even went as fairly easy and clean. I just had to make requests to the API in the *before()* hooks to create two different users and switch between them throughout my test suites. The same went for the other resources as I could create them during tests and store their ids for later use.
