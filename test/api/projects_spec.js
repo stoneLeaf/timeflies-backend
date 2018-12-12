@@ -3,7 +3,7 @@ const chaiHttp = require('chai-http')
 const expect = chai.expect
 
 const factories = require('./factories')
-const { createUserAlpha, createUserBeta, setAuthHeader,
+const { createUserAlpha, createUserBeta, createProjectEndpoint, setAuthHeader,
   expectFailedValidationResponse,
   expectForbiddenResponse,
   expectNotFoundResponse } = require('./helpers')
@@ -11,7 +11,7 @@ const { app, readyCallback, resetDatabase } = require('./server_interface')
 
 chai.use(chaiHttp)
 
-describe('API integration tests for the project resource', function () {
+describe('API integration tests for the \'project\' resource', function () {
   let requester = chai.request(app).keepOpen()
   let commonEndpoint = '/api/projects'
 
@@ -43,7 +43,7 @@ describe('API integration tests for the project resource', function () {
   })
 
   describe('POST /projects (Create project)', function () {
-    let endpoint = commonEndpoint
+    let endpoint = createProjectEndpoint
 
     function expectRejectedParams (params) {
       return setAuthHeader(requester.post(endpoint), userAlphaToken)
@@ -162,7 +162,7 @@ describe('API integration tests for the project resource', function () {
     })
 
     it('Should require at least one param', function () {
-      return setAuthHeader(requester.post(endpoint), userAlphaToken)
+      return setAuthHeader(requester.patch(endpoint), userAlphaToken)
         .send({}).then(function (res) {
           expectFailedValidationResponse(res)
         })
@@ -182,8 +182,8 @@ describe('API integration tests for the project resource', function () {
     })
 
     it('Should properly handle non existent resources', function () {
-      let specificEndpoint = `${commonEndpoint}/${nonExistentProjectId}`
-      return setAuthHeader(requester.patch(specificEndpoint), userAlphaToken)
+      let specificURI = `${commonEndpoint}/${nonExistentProjectId}`
+      return setAuthHeader(requester.patch(specificURI), userAlphaToken)
         .send({ name: 'New name' }).then(function (res) {
           expectNotFoundResponse(res)
         })
@@ -209,8 +209,8 @@ describe('API integration tests for the project resource', function () {
     })
 
     it('Should properly handle non existent resources', function () {
-      let specificEndpoint = `${commonEndpoint}/${nonExistentProjectId}`
-      return setAuthHeader(requester.delete(specificEndpoint), userAlphaToken)
+      let specificURI = `${commonEndpoint}/${nonExistentProjectId}`
+      return setAuthHeader(requester.delete(specificURI), userAlphaToken)
         .send().then(function (res) {
           expectNotFoundResponse(res)
         })

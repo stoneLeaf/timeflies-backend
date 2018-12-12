@@ -16,6 +16,8 @@ Helpers.createUserBeta = function (requester) {
     .send(factories.betaRegistrationParams())
 }
 
+Helpers.createProjectEndpoint = '/api/projects'
+
 Helpers.userProfileEndpoint = '/api/profile'
 
 Helpers.setAuthHeader = function (requester, token) {
