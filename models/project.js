@@ -27,7 +27,15 @@ ProjectSchema.pre('validate', function () {
   if (this.name) this.slug = slugify(this.name, { lower: true }).substr(0, 70)
 })
 
-// TODO: validate name and slug uniqueness in User scope
+ProjectSchema.pre('validate', function () {
+  let model = this
+  if (model.name) {
+    return mongoose.model('Project').findOne({ name: this.name }).exec().then(function (project) {
+      if (project) model.invalidate('name', 'must be unique in the user\'s scope')
+    })
+  }
+})
+
 // TODO: add pre/post remove middleware removing dependent activities
 
 module.exports = mongoose.model('Project', ProjectSchema)
