@@ -176,9 +176,9 @@ describe('API integration tests for the \'activity\' resource', function () {
           expect(res).to.be.json
           expect(res).to.have.status(200)
           expect(res.body).to.have.property('activities')
-          expect(res.body.activities).to.be.an('array')
-            .which.nested.include({ id: firstActivityId })
-            .and.which.nested.include({ id: secondActivityId })
+          expect(res.body.activities).to.be.an('array').and.have.lengthOf(2)
+          expect(res.body.activities[0]).to.nested.include({ id: firstActivityId })
+          expect(res.body.activities[1]).to.nested.include({ id: secondActivityId })
         })
     })
   })
@@ -237,9 +237,8 @@ describe('API integration tests for the \'activity\' resource', function () {
         })
     })
 
-    it('Should properly handle non existent resources', function () {
-      let specificURI = `${commonEndpoint}/${nonExistentActivityId}`
-      return setAuthHeader(requester.delete(specificURI), userAlphaToken)
+    it('Should make the resource non existent', function () {
+      return setAuthHeader(requester.delete(endpoint), userAlphaToken)
         .send().then(function (res) {
           expectNotFoundResponse(res)
         })

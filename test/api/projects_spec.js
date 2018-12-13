@@ -105,9 +105,9 @@ describe('API integration tests for the \'project\' resource', function () {
           expect(res).to.be.json
           expect(res).to.have.status(200)
           expect(res.body).to.have.property('projects')
-          expect(res.body.projects).to.be.an('array')
-            .which.nested.include({ id: ceresProjectId })
-            .and.which.nested.include({ id: venusProjectId })
+          expect(res.body.projects).to.be.an('array').and.have.lengthOf(2)
+          expect(res.body.projects[0]).to.nested.include({ id: ceresProjectId.toString() })
+          expect(res.body.projects[1]).to.nested.include({ id: venusProjectId.toString() })
         })
     })
   })
@@ -220,9 +220,8 @@ describe('API integration tests for the \'project\' resource', function () {
         })
     })
 
-    it('Should properly handle non existent resources', function () {
-      let specificURI = `${commonEndpoint}/${nonExistentProjectId}`
-      return setAuthHeader(requester.delete(specificURI), userAlphaToken)
+    it('Should make the resource non existent', function () {
+      return setAuthHeader(requester.delete(endpoint), userAlphaToken)
         .send().then(function (res) {
           expectNotFoundResponse(res)
         })
