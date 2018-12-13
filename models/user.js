@@ -29,27 +29,23 @@ var UserSchema = new Schema({
 }, { timestamps: true })
 
 // Because the unique option only creates the index and does not do validation
-UserSchema.pre('validate', function (next) {
-  this.constructor.findOne({ 'profile.email': this.profile.email }).exec()
+UserSchema.pre('validate', function () {
+  return mongoose.model('User').findOne({ 'profile.email': this.profile.email }).exec()
     // Using arrow function to keep context
     .then((results) => {
       if (results) this.invalidate('email', 'is already taken')
-      next()
-    }).catch((err) => { next(err) })
+    })
 })
 
-UserSchema.pre('save', function (next) {
-  bcrypt.hash(this.password, BCRYPT_ROUNDS).then((hash) => {
+UserSchema.pre('save', function () {
+  return bcrypt.hash(this.password, BCRYPT_ROUNDS).then((hash) => {
     this.password = hash
-    next()
   })
 })
 
-// Asynchronous method
-UserSchema.methods.validatePassword = function (password, callback) {
-  bcrypt.compare(password, this.password).then(function (result) {
-    callback(result)
-  })
+// Promise based method
+UserSchema.methods.validatePassword = function (password) {
+  return bcrypt.compare(password, this.password)
 }
 
 // TODO: add pre/post remove middleware removing dependent projects and activities

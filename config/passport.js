@@ -10,8 +10,8 @@ passport.use(new LocalStrategy({ usernameField: 'email', session: false },
   function (email, password, done) {
     User.findOne({ 'profile.email': email }).then((user) => {
       if (!user) return done(null, false)
-      user.validatePassword(password, function (result) {
-        if (!result) return done(null, false)
+      user.validatePassword(password).then(function (match) {
+        if (!match) return done(null, false)
         return done(null, user)
       })
     }).catch((err) => { done(err) })
