@@ -17,6 +17,14 @@ ProjectsController.setProjectOnParam = function (req, res, next, value, name) {
   })
 }
 
+ProjectsController.onlyAllowOwner = function (req, res, next) {
+  if (req.user._id.toString() !== req.project.owner.toString()) {
+    res.status(403).json({ errors: 'Access denied' })
+  } else {
+    next()
+  }
+}
+
 ProjectsController.create = function (req, res, next) {
   req.body.owner = req.user._id
   new Project(req.body).save().then(function (project) {
@@ -26,13 +34,9 @@ ProjectsController.create = function (req, res, next) {
   }).catch((err) => { next(err) })
 }
 
-ProjectsController.getById = function (req, res, next) {
-  if (req.user._id.toString() !== req.project.owner.toString()) {
-    res.status(403).json({ errors: 'Access denied' })
-  } else {
-    res.status(200).json({ project: req.project.publicJSON() })
-  }
-}
+ProjectsController.getById = [ProjectsController.onlyAllowOwner, function (req, res, next) {
+  res.status(200).json({ project: req.project.publicJSON() })
+}]
 
 ProjectsController.getAll = function (req, res, next) {
   Project.find({ owner: req.user._id }).exec().then(function (arr) {
