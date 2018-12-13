@@ -35,6 +35,14 @@ ProjectSchema.pre('validate', function () {
   }
 })
 
+ProjectSchema.methods.publicJSON = function () {
+  let publicJSON = this.toObject()
+  publicJSON.id = publicJSON._id
+  delete publicJSON._id
+  delete publicJSON.__v
+  return publicJSON
+}
+
 // TODO: add pre/post remove middleware removing dependent activities
 
 module.exports = mongoose.model('Project', ProjectSchema)
