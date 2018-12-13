@@ -28,10 +28,9 @@ ProjectSchema.pre('validate', function () {
 })
 
 ProjectSchema.pre('validate', function () {
-  let model = this
-  if (model.name) {
-    return mongoose.model('Project').findOne({ name: this.name }).exec().then(function (project) {
-      if (project) model.invalidate('name', 'must be unique in the user\'s scope')
+  if (this.name) {
+    return mongoose.model('Project').findOne({ name: this.name }).exec().then((project) => {
+      if (project) this.invalidate('name', 'must be unique in the user\'s scope')
     })
   }
 })
