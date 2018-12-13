@@ -44,15 +44,23 @@ module.exports.venusProjectParams = function () {
 }
 
 module.exports.firstActivityParams = function () {
+  let startDate = new Date()
+  startDate.setHours(startDate.getHours() - 1)
+  let endDate = new Date(startDate)
+  endDate.setMinutes(endDate.getMinutes() + 10)
   return {
-    startDate: (new Date()).toJSON(),
+    startDate: startDate,
+    endDate: endDate,
     description: 'Getting started'
   }
 }
 
 module.exports.secondActivityParams = function () {
+  let firstActivityEndDate = module.exports.firstActivityParams().endDate
+  let deltaToNow = (new Date()).getTime() - firstActivityEndDate.getTime()
+  let startDate = new Date(((new Date()).getTime() - (deltaToNow / 2)))
   return {
-    startDate: (new Date()).toJSON(),
+    startDate: startDate,
     description: 'Keeping up'
   }
 }

@@ -66,51 +66,109 @@ describe('API integration tests for the \'activity\' resource', function () {
     })
 
     it('Should require a start date', function () {
-      let params = factories.firstActivityParams()
-      delete params.startDate
+      let params = {}
       return expectRejectedParams(params)
     })
 
     it('Should reject non ISO 8601 dates', function () {
       // TODO: add other test cases
-      let params = factories.firstActivityParams()
+      let params = {}
       params.startDate = 'aaa'
       return expectRejectedParams(params)
     })
 
     it('Should reject future start dates', function () {
-      let params = factories.firstActivityParams()
+      let params = {}
       let futureDate = new Date()
-      futureDate.setUTCFullYear(futureDate.getUTCFullYear() + 1)
-      params.startDate = futureDate.toJSON()
+      futureDate.setHours(futureDate.getHours() + 1)
+      params.startDate = futureDate
+      return expectRejectedParams(params)
+    })
+
+    it('Should reject future end dates', function () {
+      let params = {}
+      params.startDate = new Date()
+      let futureDate = new Date(params.startDate)
+      futureDate.setHours(futureDate.getHours() + 1)
+      params.endDate = futureDate
       return expectRejectedParams(params)
     })
 
     it('Should not allow the end date to be before the start date', function () {
-      let params = factories.firstActivityParams()
+      let params = {}
+      params.startDate = new Date()
       let pastDate = new Date()
-      pastDate.setUTCFullYear(pastDate.getUTCFullYear() - 1)
-      params.endDate = pastDate.toJSON()
+      pastDate.setHours(pastDate.getHours() - 1)
+      params.endDate = pastDate
       return expectRejectedParams(params)
     })
 
-    it('Should return an activity belonging to the project', function () {
+    it('Should return an activity on success', function () {
+      let params = factories.firstActivityParams()
       return setAuthHeader(requester.post(endpoint), userAlphaToken)
-        .send(factories.firstActivityParams()).then(function (res) {
+        .send(params).then(function (res) {
           expect(res).to.be.json
           expect(res).to.have.status(201)
           expect(res.body).to.have.property('activity')
-          expect(res.body.activity).to.have.property('id')
+          expect(res.body.activity).to.have.property('description')
+          expect(res.body.activity.description).to.equal(params.description)
           expect(res.body.activity).to.have.property('project')
           expect(res.body.activity.project).to.equal(ceresProjectId)
+          expect(res.body.activity).to.have.property('id')
           firstActivityId = res.body.activity.id
           // As per HTTP code 201 RFC spec
           expect(res.header).to.have.property('location')
         })
     })
 
-    it('Should not be able to create an activity in the same time frame as another', function () {
-      return expectRejectedParams(factories.secondActivityParams())
+    it('Should not allow an activity which starts in the same time frame as another', function () {
+      let params = {}
+      let { startDate, endDate } = factories.firstActivityParams()
+      let firstActivityDuration = endDate.getTime() - startDate.getTime()
+      params.startDate = new Date(endDate.getTime() - (firstActivityDuration / 2))
+      params.endDate = new Date()
+      return expectRejectedParams(params)
+    })
+
+    it('Should not allow a running activity which starts in the same time frame as another', function () {
+      let params = {}
+      let { startDate, endDate } = factories.firstActivityParams()
+      let firstActivityDuration = endDate.getTime() - startDate.getTime()
+      params.startDate = new Date(endDate.getTime() - (firstActivityDuration / 2))
+      return expectRejectedParams(params)
+    })
+
+    it('Should not allow a running activity which starts before an other activity', function () {
+      let params = {}
+      params.startDate = factories.firstActivityParams().startDate
+      params.startDate.setHours(params.startDate.getHours() - 1)
+      return expectRejectedParams(params)
+    })
+
+    it('Should not allow an activity which ends in the same time frame as another', function () {
+      let params = {}
+      let { startDate, endDate } = factories.firstActivityParams()
+      params.startDate = new Date(startDate)
+      params.startDate.setHours(startDate.getHours() - 1)
+      let firstActivityDuration = endDate.getTime() - startDate.getTime()
+      params.endDate = new Date(startDate.getTime() + (firstActivityDuration / 2))
+      return expectRejectedParams(params)
+    })
+
+    it('Should allow creation outside the time frame of another activity', function () {
+      let params = factories.secondActivityParams()
+      return setAuthHeader(requester.post(endpoint), userAlphaToken)
+        .send(params).then(function (res) {
+          expect(res).to.be.json
+          expect(res).to.have.status(201)
+          secondActivityId = res.body.activity.id
+        })
+    })
+
+    it('Should not allow creation of a running activity while one is already running', function () {
+      let params = {}
+      params.startDate = new Date()
+      return expectRejectedParams(params)
     })
   })
 
@@ -118,12 +176,12 @@ describe('API integration tests for the \'activity\' resource', function () {
     let endpoint
 
     before('Setting endpoint', function () {
-      endpoint = `${commonEndpoint}/${firstActivityId}`
+      endpoint = `${commonEndpoint}/${secondActivityId}`
     })
 
     it('Should be denied to all users other than the owner', function () {
       let params = {}
-      params.endDate = (new Date()).toJSON()
+      params.endDate = (new Date())
       return setAuthHeader(requester.patch(endpoint), userBetaToken)
         .send(params).then(function (res) {
           expectForbiddenResponse(res)
@@ -139,7 +197,7 @@ describe('API integration tests for the \'activity\' resource', function () {
 
     it('Should return the updated activity on success', function () {
       let params = {}
-      params.endDate = (new Date()).toJSON()
+      params.endDate = (new Date())
       return setAuthHeader(requester.patch(endpoint), userAlphaToken)
         .send(params).then(function (res) {
           expect(res).to.be.json
@@ -153,7 +211,7 @@ describe('API integration tests for the \'activity\' resource', function () {
     it('Should properly handle non existent resources', function () {
       let specificEndpoint = `${commonEndpoint}/${nonExistentActivityId}`
       return setAuthHeader(requester.patch(specificEndpoint), userAlphaToken)
-        .send({ endDate: (new Date()).toJSON() }).then(function (res) {
+        .send({ endDate: (new Date()) }).then(function (res) {
           expectNotFoundResponse(res)
         })
     })
@@ -161,14 +219,6 @@ describe('API integration tests for the \'activity\' resource', function () {
 
   describe('GET /activities (List current user last activities)', function () {
     let endpoint = commonEndpoint
-
-    before('Creating a second activity', function () {
-      let createEndpoint = `/api/projects/${ceresProjectId}/activities`
-      return setAuthHeader(requester.post(createEndpoint), userAlphaToken)
-        .send(factories.secondActivityParams()).then(function (res) {
-          secondActivityId = res.body.activity.id
-        })
-    })
 
     it('Should output a array of the projects\' activities', function () {
       return setAuthHeader(requester.get(endpoint), userAlphaToken)
