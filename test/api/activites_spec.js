@@ -81,7 +81,7 @@ describe('API integration tests for the \'activity\' resource', function () {
     it('Should reject future start dates', function () {
       let params = factories.firstActivityParams()
       let futureDate = new Date()
-      futureDate = futureDate.setUTCFullYear(futureDate.getUTCFullYear() + 1)
+      futureDate.setUTCFullYear(futureDate.getUTCFullYear() + 1)
       params.startDate = futureDate.toJSON()
       return expectRejectedParams(params)
     })
@@ -89,7 +89,7 @@ describe('API integration tests for the \'activity\' resource', function () {
     it('Should not allow the end date to be before the start date', function () {
       let params = factories.firstActivityParams()
       let pastDate = new Date()
-      pastDate = pastDate.setUTCFullYear(pastDate.getUTCFullYear() - 1)
+      pastDate.setUTCFullYear(pastDate.getUTCFullYear() - 1)
       params.endDate = pastDate.toJSON()
       return expectRejectedParams(params)
     })
