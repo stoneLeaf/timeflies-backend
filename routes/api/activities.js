@@ -1,18 +1,23 @@
 const router = require('express').Router()
 const logger = require('winston')
 
+const auth = require('../../middlewares/auth')
+const ActivitiesController = require('../../controllers/activities_controller')
+const ProjectsController = require('../../controllers/projects_controller')
+
+router.all('*', auth.required)
+
+router.param('project_id', ProjectsController.setProjectOnParam)
 router.param('activity_id', function (req, res, next, value, name) {
   logger.debug('Fetching activity from :activity_id param')
   req.activity = 'dummy'
   next()
 })
 
+router.post('/projects/:project_id/activities', ActivitiesController.create)
+
 router.get('/activities', function (req, res, next) {
   res.status(200).json({ debug: 'activities list' })
-})
-
-router.post('/activities', function (req, res, next) {
-  res.status(200).json({ debug: 'activities create' })
 })
 
 router.get('/activities/:activity_id', function (req, res, next) {
