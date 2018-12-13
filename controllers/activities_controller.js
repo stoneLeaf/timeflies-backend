@@ -6,7 +6,9 @@ var ActivitiesController = exports = module.exports = {}
 ActivitiesController.create = function (req, res, next) {
   req.body.owner = req.user._id
   req.body.project = req.project._id
-  new Activity(req.body).save().then(function (activity) {
-    res.status(200).json({ activity: activity.publicJSON() })
+  return (new Activity(req.body)).save().then(function (newActivity) {
+    // TODO: the activity URI should not be hard-coded
+    res.set('location', `/api/activities/${newActivity.id}`)
+      .status(201).json({ activity: newActivity.publicJSON() })
   }).catch((err) => { next(err) })
 }

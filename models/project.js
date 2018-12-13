@@ -29,6 +29,7 @@ ProjectSchema.pre('validate', function () {
 
 ProjectSchema.pre('validate', function () {
   if (this.name) {
+    // FIXME: in USER's scope, not global scope
     return mongoose.model('Project').findOne({ name: this.name }).exec().then((project) => {
       if (project) this.invalidate('name', 'must be unique in the user\'s scope')
     })
