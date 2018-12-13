@@ -40,3 +40,14 @@ ProjectsController.getById = function (req, res, next) {
     res.status(200).json({ project: req.project })
   }
 }
+
+ProjectsController.getAll = function (req, res, next) {
+  Project.find({ owner: req.user._id }).exec().then(function (arr) {
+    let projects = arr.map(project => {
+      project = project.toObject()
+      project.id = project._id
+      return project
+    })
+    res.status(200).json({ projects: projects })
+  }).catch((err) => { next(err) })
+}
