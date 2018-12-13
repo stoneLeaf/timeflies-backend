@@ -46,3 +46,9 @@ ProjectsController.getAll = function (req, res, next) {
     res.status(200).json({ projects: projects })
   }).catch((err) => { next(err) })
 }
+
+ProjectsController.update = [ProjectsController.onlyAllowOwner, function (req, res, next) {
+  req.project.set(req.body).save().then(function (updatedProject) {
+    res.status(200).json({ project: updatedProject.publicJSON() })
+  }).catch((err) => { next(err) })
+}]

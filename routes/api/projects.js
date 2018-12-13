@@ -10,6 +10,8 @@ router.get('/projects', auth.required, ProjectsController.getAll)
 
 router.get('/projects/:project_id', auth.required, ProjectsController.getById)
 
+router.patch('/projects/:project_id', auth.required, ProjectsController.update)
+
 router.get('/projects/:project_id/activities', function (req, res, next) {
   res.status(200).json({ debug: 'projects id ' + req.params.project_id + ' activities' })
 })
