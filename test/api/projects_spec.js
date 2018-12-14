@@ -98,23 +98,46 @@ describe('API integration tests for the \'project\' resource', function () {
   describe('GET /projects (List current user projects)', function () {
     let endpoint = commonEndpoint
     let venusProjectId
+    let aldebaranProjectId
 
-    before('Creating a second project', function () {
+    before('Creating other projects', function () {
       return setAuthHeader(requester.post(endpoint), userAlphaToken)
         .send(factories.venusProjectParams()).then(function (res) {
           venusProjectId = res.body.project.id
+        }).then(function () {
+          return setAuthHeader(requester.post(endpoint), userAlphaToken)
+          .send(factories.aldebaranProjectParams())
+        }).then(function (res) {
+          aldebaranProjectId = res.body.project.id
         })
     })
 
-    it('Should output a array of the current user\'s projects', function () {
+    it('Should output a array in alphabetical order', function () {
       return setAuthHeader(requester.get(endpoint), userAlphaToken)
         .send().then(function (res) {
           expect(res).to.be.json
           expect(res).to.have.status(200)
           expect(res.body).to.have.property('projects')
-          expect(res.body.projects).to.be.an('array').and.have.lengthOf(2)
+          expect(res.body.projects).to.be.an('array').and.have.lengthOf(3)
+          expect(res.body.projects[0]).to.nested.include({ id: aldebaranProjectId.toString() })
+          expect(res.body.projects[1]).to.nested.include({ id: ceresProjectId.toString() })
+          expect(res.body.projects[2]).to.nested.include({ id: venusProjectId.toString() })
+        })
+    })
+
+    it('Should have pagination', function() {
+      let params = {}
+      params.limit = 1
+      params.offset = 1
+      return setAuthHeader(requester.get(endpoint), userAlphaToken)
+        .send(params).then(function (res) {
+          expect(res).to.be.json
+          expect(res).to.have.status(200)
+          expect(res.body).to.have.property('projects')
+          expect(res.body.projects).to.be.an('array').and.have.lengthOf(1)
           expect(res.body.projects[0]).to.nested.include({ id: ceresProjectId.toString() })
-          expect(res.body.projects[1]).to.nested.include({ id: venusProjectId.toString() })
+          expect(res.body).to.have.property('total')
+          expect(res.body.total).to.be.equal(3)
         })
     })
   })
@@ -160,12 +183,6 @@ describe('API integration tests for the \'project\' resource', function () {
     before('Setting endpoint', function () {
       endpoint = `${commonEndpoint}/${ceresProjectId}`
     })
-
-    /**
-     * Note: Validation is only tested in resource creation as usually the same
-     * inner logics are called when updating.
-     * // TODO: should probably be tested everywhere, but must find a DRY way
-     */
 
     it('Should be denied to all users other than the owner', function () {
       let params = {}
