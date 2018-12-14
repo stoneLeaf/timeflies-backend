@@ -41,6 +41,7 @@ ActivitySchema.pre('validate', function () {
     // Cannot have two running activities at once
     // This check is enough because we also invalidate dates happening in the futures
     return mongoose.model('Activity').findOne({
+      _id: {$ne: this._id},
       owner: this.owner,
       endDate: { $exists: false }
     }).exec().then((runningActivity) => {
@@ -60,10 +61,12 @@ ActivitySchema.pre('validate', function () {
     })
   } else if (this.startDate && this.endDate) {
     return mongoose.model('Activity').findOne().or([
-      { owner: this.owner,
+      { _id: {$ne: this._id},
+        owner: this.owner,
         startDate: { $lt: this.startDate },
         endDate: { $gt: this.startDate } },
-      { owner: this.owner,
+      { _id: {$ne: this._id},
+        owner: this.owner,
         startDate: { $lt: this.endDate },
         endDate: { $gt: this.endDate }
       }]).exec().then((overlappingActivity) => {

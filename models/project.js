@@ -30,6 +30,7 @@ ProjectSchema.pre('validate', function () {
 ProjectSchema.pre('validate', function () {
   if (this.name && this.owner) {
     return mongoose.model('Project').findOne({
+      _id: { $ne: this._id },
       owner: this.owner,
       name: this.name
     }).exec().then((project) => {
