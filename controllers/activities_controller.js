@@ -17,7 +17,7 @@ ActivitiesController.setActivityOnParam = function (req, res, next, id, name) {
   })
 }
 
-ActivitiesController.onAllowOwner = function (req, res, next) {
+ActivitiesController.onlyAllowOwner = function (req, res, next) {
   if (req.activity.owner.toString() !== req.user._id.toString()) {
     res.status(403).json({ errors: 'Access denied' })
   } else {
@@ -35,14 +35,18 @@ ActivitiesController.create = function (req, res, next) {
   }).catch((err) => { next(err) })
 }
 
-ActivitiesController.update = [ActivitiesController.onAllowOwner, function (req, res, next) {
+ActivitiesController.update = [ActivitiesController.onlyAllowOwner, function (req, res, next) {
   req.activity.set(req.body).save().then(function (updatedActivity) {
     res.status(200).json({ activity: updatedActivity.publicJSON() })
   }).catch(function (err) { next(err) })
 }]
 
-ActivitiesController.delete = [ActivitiesController.onAllowOwner, function (req, res, next) {
+ActivitiesController.delete = [ActivitiesController.onlyAllowOwner, function (req, res, next) {
   Activity.deleteOne({ _id: req.activity._id }).then(function () {
     res.status(200).json({ message: 'Activity deleted' })
   })
+}]
+
+ActivitiesController.getById = [ActivitiesController.onlyAllowOwner, function (req, res, next) {
+  res.status(200).json({ activity: req.activity.publicJSON() })
 }]

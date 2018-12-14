@@ -13,13 +13,10 @@ router.param('activity_id', ActivitiesController.setActivityOnParam)
 router.post('/projects/:project_id/activities', ActivitiesController.create)
 router.patch('/activities/:activity_id', ActivitiesController.update)
 router.delete('/activities/:activity_id', ActivitiesController.delete)
+router.get('/activities/:activity_id', ActivitiesController.getById)
 
 router.get('/activities', function (req, res, next) {
   res.status(200).json({ debug: 'activities list' })
-})
-
-router.get('/activities/:activity_id', function (req, res, next) {
-  res.status(200).json({ debug: 'activities read id ' + req.params.activity_id })
 })
 
 module.exports = router
