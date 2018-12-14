@@ -188,10 +188,12 @@ describe('API integration tests for the \'activity\' resource', function () {
         })
     })
 
-    it('Should require at least one param', function () {
+    it('Should allow patch without changes', function () {
+      let params = factories.secondActivityParams()
       return setAuthHeader(requester.patch(endpoint), userAlphaToken)
-        .send({}).then(function (res) {
-          expectFailedValidationResponse(res)
+        .send(params).then(function (res) {
+          expect(res).to.be.json
+          expect(res).to.have.status(200)
         })
     })
 

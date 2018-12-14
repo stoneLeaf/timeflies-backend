@@ -176,14 +176,16 @@ describe('API integration tests for the \'project\' resource', function () {
         })
     })
 
-    it('Should require at least one param', function () {
+    it('Should allow patch without changes', function () {
+      let params = factories.ceresProjectParams()
       return setAuthHeader(requester.patch(endpoint), userAlphaToken)
-        .send({}).then(function (res) {
-          expectFailedValidationResponse(res)
+        .send(params).then(function (res) {
+          expect(res).to.be.json
+          expect(res).to.have.status(200)
         })
     })
 
-    it('Should accept valid params and return updated project', function () {
+    it('Should return updated project on success', function () {
       let params = {}
       params.name = 'New name again'
       return setAuthHeader(requester.patch(endpoint), userAlphaToken)
