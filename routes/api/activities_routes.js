@@ -15,8 +15,6 @@ router.patch('/activities/:activity_id', ActivitiesController.update)
 router.delete('/activities/:activity_id', ActivitiesController.delete)
 router.get('/activities/:activity_id', ActivitiesController.getById)
 
-router.get('/activities', function (req, res, next) {
-  res.status(200).json({ debug: 'activities list' })
-})
+router.get('/activities', ActivitiesController.getAll)
 
 module.exports = router

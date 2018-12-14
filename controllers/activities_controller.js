@@ -50,3 +50,10 @@ ActivitiesController.delete = [ActivitiesController.onlyAllowOwner, function (re
 ActivitiesController.getById = [ActivitiesController.onlyAllowOwner, function (req, res, next) {
   res.status(200).json({ activity: req.activity.publicJSON() })
 }]
+
+ActivitiesController.getAll = function (req, res, next) {
+  Activity.find({ owner: req.user._id }).exec().then(function (arr) {
+    let activities = arr.map((activity) => activity.publicJSON())
+      res.status(200).json({ activities: activities })
+  })
+}
