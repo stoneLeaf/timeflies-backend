@@ -70,7 +70,7 @@ describe('API integration tests for the \'project\' resource', function () {
       return expectRejectedParams(params)
     })
 
-    it('Should accept valid params and return project', function () {
+    it('Should return the new project on validation success', function () {
       return setAuthHeader(requester.post(endpoint), userAlphaToken)
         .send(factories.ceresProjectParams()).then(function (res) {
           expect(res).to.be.json
@@ -83,8 +83,15 @@ describe('API integration tests for the \'project\' resource', function () {
         })
     })
 
-    it('Should enforce name uniqueness in user\'s scope', function () {
+    it('Should not allow a project with the same name in the user\'s scope', function () {
       return expectRejectedParams(factories.ceresProjectParams())
+    })
+
+    it('Should allow another user to create a project with the same name', function() {
+      return setAuthHeader(requester.post(endpoint), userBetaToken)
+        .send(factories.ceresProjectParams()).then(function (res) {
+          expect(res).to.have.status(201)
+        })
     })
   })
 
