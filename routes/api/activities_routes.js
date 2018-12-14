@@ -8,13 +8,10 @@ const ProjectsController = require('../../controllers/projects_controller')
 router.all('*', auth.required)
 
 router.param('project_id', ProjectsController.setProjectOnParam)
-router.param('activity_id', function (req, res, next, value, name) {
-  logger.debug('Fetching activity from :activity_id param')
-  req.activity = 'dummy'
-  next()
-})
+router.param('activity_id', ActivitiesController.setActivityOnParam)
 
 router.post('/projects/:project_id/activities', ActivitiesController.create)
+router.patch('/activities/:activity_id', ActivitiesController.update)
 
 router.get('/activities', function (req, res, next) {
   res.status(200).json({ debug: 'activities list' })

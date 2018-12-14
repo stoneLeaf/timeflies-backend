@@ -3,6 +3,28 @@ const Activity = mongoose.model('Activity')
 
 var ActivitiesController = exports = module.exports = {}
 
+ActivitiesController.setActivityOnParam = function (req, res, next, id, name) {
+  Activity.findById(id).exec().then(function (activity) {
+    if (!activity) throw new Error('Not found')
+    req.activity = activity
+    next()
+  }).catch(function (err) {
+    if (err.name === 'CastError' || err.message === 'Not found') {
+      res.status(404).json({ errors: 'Activity not found' })
+    } else {
+      next(err)
+    }
+  })
+}
+
+ActivitiesController.onAllowOwner = function (req, res, next) {
+  if (req.activity.owner.toString() !== req.user._id.toString()) {
+    res.status(403).json({ errors: 'Access denied' })
+  } else {
+    next()
+  }
+}
+
 ActivitiesController.create = function (req, res, next) {
   req.body.owner = req.user._id
   req.body.project = req.project._id
@@ -12,3 +34,9 @@ ActivitiesController.create = function (req, res, next) {
       .status(201).json({ activity: newActivity.publicJSON() })
   }).catch((err) => { next(err) })
 }
+
+ActivitiesController.update = [ActivitiesController.onAllowOwner, function (req, res, next) {
+  req.activity.set(req.body).save().then(function (updatedActivity) {
+    res.status(200).json({ activity: updatedActivity.publicJSON() })
+  }).catch(function (err) { next(err) })
+}]
