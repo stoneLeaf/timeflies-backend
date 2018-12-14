@@ -43,6 +43,13 @@ module.exports.venusProjectParams = function () {
   }
 }
 
+module.exports.aldebaranProjectParams = function () {
+  return {
+    name: 'Aldebaran',
+    description: ''
+  }
+}
+
 module.exports.firstActivityParams = function () {
   let startDate = new Date()
   startDate.setHours(startDate.getHours() - 1)

@@ -39,11 +39,24 @@ ProjectsController.getById = [ProjectsController.onlyAllowOwner, function (req, 
 }]
 
 ProjectsController.getAll = function (req, res, next) {
-  Project.find({ owner: req.user._id }).exec().then(function (arr) {
-    let projects = arr.map(project => {
-      return project.publicJSON()
+  // TODO: add checks to the input (numbers?, max and min values)
+  let limit = req.body.limit || 5
+  let offset = req.body.offset || 0
+  let response = {}
+
+  // TODO: could probably make a single query instead of count() + find()
+  Project.countDocuments({ owner: req.user._id }).then(function (total) {
+    response.total = total
+  }).then(function () {
+    return Project.find({ owner: req.user._id }).sort({ name: 'asc' })
+    .skip(offset).limit(limit).exec().then(function (arr) {
+      response.limit = limit
+      response.offset = offset
+      response.projects = arr.map(project => {
+        return project.publicJSON()
+      })
+      res.status(200).json(response)
     })
-    res.status(200).json({ projects: projects })
   }).catch((err) => { next(err) })
 }
 
