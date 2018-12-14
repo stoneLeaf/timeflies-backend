@@ -40,3 +40,9 @@ ActivitiesController.update = [ActivitiesController.onAllowOwner, function (req,
     res.status(200).json({ activity: updatedActivity.publicJSON() })
   }).catch(function (err) { next(err) })
 }]
+
+ActivitiesController.delete = [ActivitiesController.onAllowOwner, function (req, res, next) {
+  Activity.deleteOne({ _id: req.activity._id }).then(function () {
+    res.status(200).json({ message: 'Activity deleted' })
+  })
+}]
