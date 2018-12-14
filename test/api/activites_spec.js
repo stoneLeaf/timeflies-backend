@@ -18,8 +18,10 @@ describe('API integration tests for the \'activity\' resource', function () {
   let userAlphaToken
   let userBetaToken
   let ceresProjectId
+  let venusProjectId
   let firstActivityId
   let secondActivityId
+  let thirdActivityId
   let nonExistentActivityId = '1773'
 
   before('Waiting for app to be ready', function () {
@@ -40,10 +42,15 @@ describe('API integration tests for the \'activity\' resource', function () {
     })
   })
 
-  before('Creating a project', function () {
+  before('Creating projects', function () {
     return setAuthHeader(requester.post(createProjectEndpoint), userAlphaToken)
       .send(factories.ceresProjectParams()).then(function (res) {
         ceresProjectId = res.body.project.id
+      }).then(function () {
+        return setAuthHeader(requester.post(createProjectEndpoint), userAlphaToken)
+        .send(factories.venusProjectParams())
+      }).then(function (res) {
+        venusProjectId = res.body.project.id
       })
   })
 
@@ -219,10 +226,21 @@ describe('API integration tests for the \'activity\' resource', function () {
     })
   })
 
-  describe('GET /activities (List current user last activities)', function () {
-    let endpoint = commonEndpoint
+  describe('GET /projects/:id/activities (List project activities)', function () {
 
-    it('Should output a array of the projects\' activities', function () {
+    before('Creating an activity for the second project', function() {
+      let endpoint = `/api/projects/${venusProjectId}/activities`
+      let params = {}
+      params.startDate = new Date()
+      return setAuthHeader(requester.post(endpoint), userAlphaToken)
+        .send(params).then(function (res) {
+          expect(res).to.have.status(201)
+          thirdActivityId = res.body.activity.id
+        })
+    })
+
+    it('Should output a array of activities belonging to the project', function () {
+      let endpoint = `/api/projects/${ceresProjectId}/activities`
       return setAuthHeader(requester.get(endpoint), userAlphaToken)
         .send().then(function (res) {
           expect(res).to.be.json
@@ -231,6 +249,23 @@ describe('API integration tests for the \'activity\' resource', function () {
           expect(res.body.activities).to.be.an('array').and.have.lengthOf(2)
           expect(res.body.activities[0]).to.nested.include({ id: firstActivityId })
           expect(res.body.activities[1]).to.nested.include({ id: secondActivityId })
+        })
+    })
+  })
+
+  describe('GET /activities (List current user last activities)', function () {
+    let endpoint = commonEndpoint
+
+    it('Should output a array with all the user activities', function () {
+      return setAuthHeader(requester.get(endpoint), userAlphaToken)
+        .send().then(function (res) {
+          expect(res).to.be.json
+          expect(res).to.have.status(200)
+          expect(res.body).to.have.property('activities')
+          expect(res.body.activities).to.be.an('array').and.have.lengthOf(3)
+          expect(res.body.activities[0]).to.nested.include({ id: firstActivityId })
+          expect(res.body.activities[1]).to.nested.include({ id: secondActivityId })
+          expect(res.body.activities[2]).to.nested.include({ id: thirdActivityId })
         })
     })
   })
