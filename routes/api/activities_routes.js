@@ -11,10 +11,11 @@ router.param('project_id', ProjectsController.setProjectOnParam)
 router.param('activity_id', ActivitiesController.setActivityOnParam)
 
 router.post('/projects/:project_id/activities', ActivitiesController.create)
+router.get('/projects/:project_id/activities', ActivitiesController.getByProject)
+
+router.get('/activities', ActivitiesController.getAll)
 router.patch('/activities/:activity_id', ActivitiesController.update)
 router.delete('/activities/:activity_id', ActivitiesController.delete)
 router.get('/activities/:activity_id', ActivitiesController.getById)
-
-router.get('/activities', ActivitiesController.getAll)
 
 module.exports = router

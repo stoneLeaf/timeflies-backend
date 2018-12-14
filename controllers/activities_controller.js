@@ -57,3 +57,10 @@ ActivitiesController.getAll = function (req, res, next) {
       res.status(200).json({ activities: activities })
   })
 }
+
+ActivitiesController.getByProject = function (req, res, next) {
+  Activity.find({ owner: req.user._id, project: req.project._id }).exec().then(function (arr) {
+    let activities = arr.map((activity) => activity.publicJSON())
+      res.status(200).json({ activities: activities })
+  })
+}
