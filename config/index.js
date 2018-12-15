@@ -1,5 +1,8 @@
 // Environnement fallback
 // TODO: set NODE_ENV value as well in case of fallback?
-var env = process.env.NODE_ENV || 'development'
+let env = process.env.NODE_ENV || 'development'
 
-module.exports = require(`./${env}`)
+let commonConfigs = require('./common')
+let envConfigs = require(`./${env}`)
+
+module.exports = Object.assign(commonConfigs, envConfigs)
