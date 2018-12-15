@@ -1,6 +1,7 @@
 const chai = require('chai')
 const chaiHttp = require('chai-http')
 const expect = chai.expect
+const jwt = require('jsonwebtoken')
 
 const factories = require('./factories')
 const { createUserAlpha,
@@ -80,6 +81,11 @@ describe('API integration tests for authentication', function () {
         .send().then(function (res) {
           expect(res).to.have.status(200)
         })
+    })
+
+    it('Should return a token which expires', function () {
+      let payload = jwt.decode(userAlphaToken, { complete: true }).payload
+      expect(payload).to.have.property('exp')
     })
   })
 })
