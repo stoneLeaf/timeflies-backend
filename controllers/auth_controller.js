@@ -8,7 +8,11 @@ var AuthController = exports = module.exports = {}
 // it allow separation of concerns
 AuthController.generateTokenForUser = function (user) {
   // TODO: jwt.sign() is synchronous, can it be a problem?
-  return jwt.sign({ email: user.profile.email }, config.jwt_secret)
+  let expiration = (new Date().getTime() / 1000) + config.jwt_duration
+  return jwt.sign({
+    email: user.profile.email,
+    exp: expiration
+  }, config.jwt_secret)
 }
 
 // Using a custom callback instead of authenticate() directly as a middleware
