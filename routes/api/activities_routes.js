@@ -1,5 +1,4 @@
 const router = require('express').Router()
-const logger = require('winston')
 
 const auth = require('../../middlewares/auth')
 const ActivitiesController = require('../../controllers/activities_controller')
@@ -11,7 +10,7 @@ router.param('project_id', ProjectsController.setProjectOnParam)
 router.param('activity_id', ActivitiesController.setActivityOnParam)
 
 router.post('/projects/:project_id/activities', ActivitiesController.create)
-router.get('/projects/:project_id/activities', ActivitiesController.getByProject)
+router.get('/projects/:project_id/activities', ActivitiesController.getAll)
 
 router.get('/activities', ActivitiesController.getAll)
 router.patch('/activities/:activity_id', ActivitiesController.update)

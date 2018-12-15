@@ -44,7 +44,7 @@ ActivitiesController.update = [ActivitiesController.onlyAllowOwner, function (re
 ActivitiesController.delete = [ActivitiesController.onlyAllowOwner, function (req, res, next) {
   Activity.deleteOne({ _id: req.activity._id }).then(function () {
     res.status(200).json({ message: 'Activity deleted' })
-  })
+  }).catch((err) => { next(err) })
 }]
 
 ActivitiesController.getById = [ActivitiesController.onlyAllowOwner, function (req, res, next) {
@@ -52,15 +52,23 @@ ActivitiesController.getById = [ActivitiesController.onlyAllowOwner, function (r
 }]
 
 ActivitiesController.getAll = function (req, res, next) {
-  Activity.find({ owner: req.user._id }).exec().then(function (arr) {
-    let activities = arr.map((activity) => activity.publicJSON())
-      res.status(200).json({ activities: activities })
-  })
-}
+  // TODO: add checks to the inputs (numbers?, valid dates?, max and min values)
+  let response = {}
+  response.limit = req.body.limit || 5
+  response.offset = req.body.offset || 0
 
-ActivitiesController.getByProject = function (req, res, next) {
-  Activity.find({ owner: req.user._id, project: req.project._id }).exec().then(function (arr) {
-    let activities = arr.map((activity) => activity.publicJSON())
-      res.status(200).json({ activities: activities })
-  })
+  let filters = { owner: req.user._id }
+  if (req.project) filters.project = req.project._id
+  if (req.body.before) filters.endDate = { $lte: req.body.before }
+  if (req.body.after) filters.startDate = { $gte: req.body.after }
+
+  Activity.countDocuments(filters).then(function (total) {
+    response.total = total
+  }).then(function () {
+    return Activity.find(filters).sort({ startDate: 'desc' })
+      .skip(response.offset).limit(response.limit).exec().then(function (arr) {
+        response.activities = arr.map((activity) => activity.publicJSON())
+        res.status(200).json(response)
+      })
+  }).catch((err) => { next(err) })
 }
