@@ -20,6 +20,7 @@ describe('API integration tests for the \'activity\' resource', function () {
   let ceresProjectId
   let venusProjectId
   let firstActivityId
+  let firstActivityEndDate
   let secondActivityId
   let thirdActivityId
   let nonExistentActivityId = '1773'
@@ -48,7 +49,7 @@ describe('API integration tests for the \'activity\' resource', function () {
         ceresProjectId = res.body.project.id
       }).then(function () {
         return setAuthHeader(requester.post(createProjectEndpoint), userAlphaToken)
-        .send(factories.venusProjectParams())
+          .send(factories.venusProjectParams())
       }).then(function (res) {
         venusProjectId = res.body.project.id
       })
@@ -112,6 +113,7 @@ describe('API integration tests for the \'activity\' resource', function () {
 
     it('Should return an activity on success', function () {
       let params = factories.firstActivityParams()
+      firstActivityEndDate = params.endDate
       return setAuthHeader(requester.post(endpoint), userAlphaToken)
         .send(params).then(function (res) {
           expect(res).to.be.json
@@ -227,8 +229,10 @@ describe('API integration tests for the \'activity\' resource', function () {
   })
 
   describe('GET /projects/:id/activities (List project activities)', function () {
+    let ceresEndpoint
 
-    before('Creating an activity for the second project', function() {
+    before('Creating an activity for the second project', function () {
+      // To make sure this endpoint filters per project
       let endpoint = `/api/projects/${venusProjectId}/activities`
       let params = {}
       params.startDate = new Date()
@@ -239,16 +243,62 @@ describe('API integration tests for the \'activity\' resource', function () {
         })
     })
 
-    it('Should output a array of activities belonging to the project', function () {
-      let endpoint = `/api/projects/${ceresProjectId}/activities`
-      return setAuthHeader(requester.get(endpoint), userAlphaToken)
+    before('Setting endpoint', function () {
+      ceresEndpoint = `/api/projects/${ceresProjectId}/activities`
+    })
+
+    it('Should output a array in reverse chronological order', function () {
+      return setAuthHeader(requester.get(ceresEndpoint), userAlphaToken)
         .send().then(function (res) {
           expect(res).to.be.json
           expect(res).to.have.status(200)
           expect(res.body).to.have.property('activities')
           expect(res.body.activities).to.be.an('array').and.have.lengthOf(2)
+          expect(res.body.activities[0]).to.nested.include({ id: secondActivityId })
+          expect(res.body.activities[1]).to.nested.include({ id: firstActivityId })
+        })
+    })
+
+    it('Should have pagination', function () {
+      let params = {}
+      params.limit = 1
+      // TODO: offset not really tested because only two activities
+      params.offset = 1
+      return setAuthHeader(requester.get(ceresEndpoint), userAlphaToken)
+        .send(params).then(function (res) {
+          expect(res).to.be.json
+          expect(res).to.have.status(200)
+          expect(res.body).to.have.property('activities')
+          expect(res.body.activities).to.be.an('array').and.have.lengthOf(1)
           expect(res.body.activities[0]).to.nested.include({ id: firstActivityId })
-          expect(res.body.activities[1]).to.nested.include({ id: secondActivityId })
+          expect(res.body).to.have.property('total')
+          expect(res.body.total).to.be.equal(2)
+        })
+    })
+
+    it('Should have a before filter', function () {
+      let params = {}
+      params.before = firstActivityEndDate
+      return setAuthHeader(requester.get(ceresEndpoint), userAlphaToken)
+        .send(params).then(function (res) {
+          expect(res).to.be.json
+          expect(res).to.have.status(200)
+          expect(res.body).to.have.property('activities')
+          expect(res.body.activities).to.be.an('array').and.have.lengthOf(1)
+          expect(res.body.activities[0]).to.nested.include({ id: firstActivityId })
+        })
+    })
+
+    it('Should have an after filter', function () {
+      let params = {}
+      params.after = firstActivityEndDate
+      return setAuthHeader(requester.get(ceresEndpoint), userAlphaToken)
+        .send(params).then(function (res) {
+          expect(res).to.be.json
+          expect(res).to.have.status(200)
+          expect(res.body).to.have.property('activities')
+          expect(res.body.activities).to.be.an('array').and.have.lengthOf(1)
+          expect(res.body.activities[0]).to.nested.include({ id: secondActivityId })
         })
     })
   })
@@ -263,9 +313,9 @@ describe('API integration tests for the \'activity\' resource', function () {
           expect(res).to.have.status(200)
           expect(res.body).to.have.property('activities')
           expect(res.body.activities).to.be.an('array').and.have.lengthOf(3)
-          expect(res.body.activities[0]).to.nested.include({ id: firstActivityId })
+          expect(res.body.activities[0]).to.nested.include({ id: thirdActivityId })
           expect(res.body.activities[1]).to.nested.include({ id: secondActivityId })
-          expect(res.body.activities[2]).to.nested.include({ id: thirdActivityId })
+          expect(res.body.activities[2]).to.nested.include({ id: firstActivityId })
         })
     })
   })
