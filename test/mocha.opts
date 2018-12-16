@@ -2,4 +2,5 @@
 --ui bdd
 --timeout 5000
 --reporter spec
+--exit
 ./test/**/*_spec.js
