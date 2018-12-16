@@ -5,9 +5,9 @@ router.get('/ping', function (req, res, next) {
   res.status(200).json({ status: 'ok' })
 })
 
-router.use(require('./auth_routes'))
 router.use(require('./users_routes'))
-router.use(require('./activities_routes'))
-router.use(require('./projects_routes'))
+router.use('/auth', require('./auth_routes'))
+router.use('/activities', require('./activities_routes'))
+router.use('/projects', require('./projects_routes'))
 
 module.exports = router
