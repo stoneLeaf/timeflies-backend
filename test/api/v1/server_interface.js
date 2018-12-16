@@ -1,4 +1,4 @@
-const { app, db } = require('../../app')
+const { app, db } = require('../../../app')
 
 module.exports = {
   /**

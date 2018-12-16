@@ -4,7 +4,9 @@ const factories = require('./factories')
 
 var Helpers = module.exports = {}
 
-Helpers.createUserEndpoint = '/api/users'
+Helpers.basePath = '/api/v1'
+
+Helpers.createUserEndpoint = `${Helpers.basePath}/users`
 
 Helpers.createUserAlpha = function (requester) {
   return requester.post(Helpers.createUserEndpoint)
@@ -16,29 +18,29 @@ Helpers.createUserBeta = function (requester) {
     .send(factories.betaRegistrationParams())
 }
 
-Helpers.createProjectEndpoint = '/api/projects'
+Helpers.createProjectEndpoint = `${Helpers.basePath}/projects`
 
-Helpers.userProfileEndpoint = '/api/profile'
+Helpers.userProfileEndpoint = `${Helpers.basePath}/profile`
 
 Helpers.setAuthHeader = function (requester, token) {
   return requester.set('Authorization', `Bearer ${token}`)
 }
 
 Helpers.expectFailedValidationResponse = function (res) {
-  expect(res).to.be.json
   expect(res).to.have.status(422)
+  expect(res).to.be.json
   expect(res.body).to.have.property('errors')
 }
 
 Helpers.expectForbiddenResponse = function (res) {
-  expect(res).to.be.json
   // Could send a 404 instead to hide the existence of the resource
   expect(res).to.have.status(403)
+  expect(res).to.be.json
   expect(res.body).to.have.property('errors')
 }
 
 Helpers.expectNotFoundResponse = function (res) {
-  expect(res).to.be.json
   expect(res).to.have.status(404)
+  expect(res).to.be.json
   expect(res.body).to.have.property('errors')
 }

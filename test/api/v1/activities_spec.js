@@ -2,18 +2,21 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 const expect = chai.expect
 
+const { app, readyCallback, resetDatabase } = require('./server_interface')
 const factories = require('./factories')
-const { createUserAlpha, createUserBeta, createProjectEndpoint, setAuthHeader,
+const { basePath,
+  createUserAlpha, createUserBeta,
+  createProjectEndpoint,
+  setAuthHeader,
   expectFailedValidationResponse,
   expectForbiddenResponse,
   expectNotFoundResponse } = require('./helpers')
-const { app, readyCallback, resetDatabase } = require('./server_interface')
 
 chai.use(chaiHttp)
 
-describe('API integration tests for the \'activity\' resource', function () {
+describe(`API v1 integration testing: 'activity' resource`, function () {
   let requester = chai.request(app).keepOpen()
-  let commonEndpoint = '/api/activities'
+  let commonEndpoint = `${basePath}/activities`
 
   let userAlphaToken
   let userBetaToken
@@ -70,7 +73,7 @@ describe('API integration tests for the \'activity\' resource', function () {
     }
 
     before('Setting endpoint', function () {
-      endpoint = `/api/projects/${ceresProjectId}/activities`
+      endpoint = `${basePath}/projects/${ceresProjectId}/activities`
     })
 
     it('Should require a start date', function () {
@@ -116,8 +119,8 @@ describe('API integration tests for the \'activity\' resource', function () {
       firstActivityEndDate = params.endDate
       return setAuthHeader(requester.post(endpoint), userAlphaToken)
         .send(params).then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(201)
+          expect(res).to.be.json
           expect(res.body).to.have.property('activity')
           expect(res.body.activity).to.have.property('description')
           expect(res.body.activity.description).to.equal(params.description)
@@ -168,8 +171,8 @@ describe('API integration tests for the \'activity\' resource', function () {
       let params = factories.secondActivityParams()
       return setAuthHeader(requester.post(endpoint), userAlphaToken)
         .send(params).then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(201)
+          expect(res).to.be.json
           secondActivityId = res.body.activity.id
         })
     })
@@ -201,8 +204,8 @@ describe('API integration tests for the \'activity\' resource', function () {
       let params = factories.secondActivityParams()
       return setAuthHeader(requester.patch(endpoint), userAlphaToken)
         .send(params).then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(200)
+          expect(res).to.be.json
         })
     })
 
@@ -211,8 +214,8 @@ describe('API integration tests for the \'activity\' resource', function () {
       params.endDate = (new Date())
       return setAuthHeader(requester.patch(endpoint), userAlphaToken)
         .send(params).then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(200)
+          expect(res).to.be.json
           expect(res.body).to.have.property('activity')
           expect(res.body.activity).to.have.property('endDate')
           expect(res.body.activity.endDate).to.be.equal(params.endDate.toJSON())
@@ -233,7 +236,7 @@ describe('API integration tests for the \'activity\' resource', function () {
 
     before('Creating an activity for the second project', function () {
       // To make sure this endpoint filters per project
-      let endpoint = `/api/projects/${venusProjectId}/activities`
+      let endpoint = `${basePath}/projects/${venusProjectId}/activities`
       let params = {}
       params.startDate = new Date()
       return setAuthHeader(requester.post(endpoint), userAlphaToken)
@@ -244,14 +247,14 @@ describe('API integration tests for the \'activity\' resource', function () {
     })
 
     before('Setting endpoint', function () {
-      ceresEndpoint = `/api/projects/${ceresProjectId}/activities`
+      ceresEndpoint = `${basePath}/projects/${ceresProjectId}/activities`
     })
 
     it('Should output a array in reverse chronological order', function () {
       return setAuthHeader(requester.get(ceresEndpoint), userAlphaToken)
         .send().then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(200)
+          expect(res).to.be.json
           expect(res.body).to.have.property('activities')
           expect(res.body.activities).to.be.an('array').and.have.lengthOf(2)
           expect(res.body.activities[0]).to.nested.include({ id: secondActivityId })
@@ -266,8 +269,8 @@ describe('API integration tests for the \'activity\' resource', function () {
       params.offset = 1
       return setAuthHeader(requester.get(ceresEndpoint), userAlphaToken)
         .send(params).then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(200)
+          expect(res).to.be.json
           expect(res.body).to.have.property('activities')
           expect(res.body.activities).to.be.an('array').and.have.lengthOf(1)
           expect(res.body.activities[0]).to.nested.include({ id: firstActivityId })
@@ -281,8 +284,8 @@ describe('API integration tests for the \'activity\' resource', function () {
       params.before = firstActivityEndDate
       return setAuthHeader(requester.get(ceresEndpoint), userAlphaToken)
         .send(params).then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(200)
+          expect(res).to.be.json
           expect(res.body).to.have.property('activities')
           expect(res.body.activities).to.be.an('array').and.have.lengthOf(1)
           expect(res.body.activities[0]).to.nested.include({ id: firstActivityId })
@@ -294,8 +297,8 @@ describe('API integration tests for the \'activity\' resource', function () {
       params.after = firstActivityEndDate
       return setAuthHeader(requester.get(ceresEndpoint), userAlphaToken)
         .send(params).then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(200)
+          expect(res).to.be.json
           expect(res.body).to.have.property('activities')
           expect(res.body.activities).to.be.an('array').and.have.lengthOf(1)
           expect(res.body.activities[0]).to.nested.include({ id: secondActivityId })
@@ -309,8 +312,8 @@ describe('API integration tests for the \'activity\' resource', function () {
     it('Should output a array with all the user activities', function () {
       return setAuthHeader(requester.get(endpoint), userAlphaToken)
         .send().then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(200)
+          expect(res).to.be.json
           expect(res.body).to.have.property('activities')
           expect(res.body.activities).to.be.an('array').and.have.lengthOf(3)
           expect(res.body.activities[0]).to.nested.include({ id: thirdActivityId })
@@ -337,8 +340,8 @@ describe('API integration tests for the \'activity\' resource', function () {
     it('Should return the activity', function () {
       return setAuthHeader(requester.get(endpoint), userAlphaToken)
         .send().then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(200)
+          expect(res).to.be.json
           expect(res.body).to.have.property('activity')
         })
     })
@@ -369,8 +372,8 @@ describe('API integration tests for the \'activity\' resource', function () {
     it('Should be allowed to the parent user', function () {
       return setAuthHeader(requester.delete(endpoint), userAlphaToken).send()
         .then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(200)
+          expect(res).to.be.json
         })
     })
 

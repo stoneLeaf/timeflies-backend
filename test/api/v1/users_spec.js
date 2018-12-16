@@ -2,18 +2,17 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 const expect = chai.expect
 
+const { app, readyCallback, resetDatabase } = require('./server_interface')
 const factories = require('./factories')
-const { createUserEndpoint, createUserAlpha,
+const { createUserEndpoint,
   userProfileEndpoint,
+  createUserAlpha,
   setAuthHeader,
   expectFailedValidationResponse } = require('./helpers')
-// Accessing the app through an implementation-agnostic interface
-const { app, readyCallback, resetDatabase } = require('./server_interface')
 
 chai.use(chaiHttp)
 
-describe('API integration tests for the user resource', function () {
-  // Keeping the connection open for multiple requests
+describe('API v1 integration testing: user resource', function () {
   let requester = chai.request(app).keepOpen()
   let userAlphaToken
 
@@ -79,8 +78,8 @@ describe('API integration tests for the user resource', function () {
       it('Should enforce email uniqueness', function () {
         // Registering a valid user
         return createUserAlpha(requester).then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(200)
+          expect(res).to.be.json
         }).then(function () {
           // Trying to register again with the same email
           return expectRejectedParams(factories.alphaRegistrationParams())
@@ -95,8 +94,8 @@ describe('API integration tests for the user resource', function () {
 
       it('Should return the user profile and a token', function () {
         return createUserAlpha(requester).then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(200)
+          expect(res).to.be.json
           expect(res.body).to.have.property('profile')
           expect(res.body).to.have.property('token')
           userAlphaToken = res.body.token
@@ -111,8 +110,8 @@ describe('API integration tests for the user resource', function () {
     it('Should return the current user profile', function () {
       return setAuthHeader(requester.get(endpoint), userAlphaToken)
         .send().then(function (res) {
-          expect(res).to.be.json
           expect(res).to.have.status(200)
+          expect(res).to.be.json
           expect(res.body).to.have.property('profile')
         })
     })
