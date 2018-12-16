@@ -49,14 +49,14 @@ ProjectsController.getAll = function (req, res, next) {
     response.total = total
   }).then(function () {
     return Project.find({ owner: req.user._id }).sort({ name: 'asc' })
-    .skip(offset).limit(limit).exec().then(function (arr) {
-      response.limit = limit
-      response.offset = offset
-      response.projects = arr.map(project => {
-        return project.publicJSON()
+      .skip(offset).limit(limit).exec().then(function (arr) {
+        response.limit = limit
+        response.offset = offset
+        response.projects = arr.map(project => {
+          return project.publicJSON()
+        })
+        res.status(200).json(response)
       })
-      res.status(200).json(response)
-    })
   }).catch((err) => { next(err) })
 }
 
