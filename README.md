@@ -1,6 +1,7 @@
 # timeflies-backend
 
-[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com) [![Build Status](https://travis-ci.com/stoneLeaf/timeflies-backend.svg?branch=master)](https://travis-ci.com/stoneLeaf/timeflies-backend)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com) ![Package version](https://img.shields.io/github/package-json/v/stoneLeaf/timeflies-backend.svg)
+ [![Build Status](https://travis-ci.com/stoneLeaf/timeflies-backend.svg?branch=master)](https://travis-ci.com/stoneLeaf/timeflies-backend)
 
 TimeFlies Node.js backend.
 
