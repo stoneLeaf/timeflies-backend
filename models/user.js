@@ -7,6 +7,12 @@ const BCRYPT_ROUNDS = 12
 var UserSchema = new Schema({
   // Nesting public data
   profile: {
+    name: {
+      type: String,
+      required: true,
+      maxlength: 50,
+      trim: true
+    },
     email: {
       type: String,
       unique: true,

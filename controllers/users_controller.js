@@ -7,6 +7,7 @@ var UsersController = exports = module.exports = {}
 UsersController.create = function (req, res, next) {
   // TODO: Remapping, not very clean?
   req.body.profile = {
+    name: req.body.name,
     email: req.body.email
   }
   new User(req.body).save().then(function (user) {

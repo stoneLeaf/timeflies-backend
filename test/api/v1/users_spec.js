@@ -45,6 +45,12 @@ describe('API v1 integration testing: user resource', function () {
         return expectRejectedParams(params)
       })
 
+      it('Should require a name', function () {
+        let params = factories.alphaRegistrationParams()
+        delete params.name
+        return expectRejectedParams(params)
+      })
+
       it('Should require a valid email', function () {
         let params = factories.alphaRegistrationParams()
         params.email = 'invalid'
@@ -113,6 +119,7 @@ describe('API v1 integration testing: user resource', function () {
           expect(res).to.have.status(200)
           expect(res).to.be.json
           expect(res.body).to.have.property('profile')
+          expect(res.body.profile).to.have.property('name')
         })
     })
   })

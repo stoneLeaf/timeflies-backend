@@ -3,6 +3,7 @@
 
 module.exports.alphaRegistrationParams = function () {
   return {
+    name: 'Alpha',
     email: 'alpha@email',
     password: 'alpha_password'
   }
@@ -17,6 +18,7 @@ module.exports.alphaLoginParams = function () {
 
 module.exports.betaRegistrationParams = function () {
   return {
+    name: 'Beta',
     email: 'beta@email',
     password: 'beta_password'
   }
