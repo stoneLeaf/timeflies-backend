@@ -1,7 +1,11 @@
 const express = require('express')
 const logger = require('./config/winston')
+const cors = require('cors')
 
 const app = express()
+
+// Allowing cross origin resource sharing (CORS)
+app.use(cors())
 
 // Logging HTTP requests with Morgan
 app.use(require('morgan')('dev', { stream: logger.stream }))

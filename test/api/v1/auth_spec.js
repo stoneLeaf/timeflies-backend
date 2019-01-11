@@ -39,6 +39,15 @@ describe('API v1 integration testing: authentication', function () {
       return resetDatabase()
     })
 
+    it('Should allow CORS', function () {
+      let params = factories.alphaLoginParams()
+      delete params.email
+      return requester.post(endpoint).send(params)
+        .then(function (res) {
+          expect(res).to.have.header('Access-Control-Allow-Origin', '*')
+        })
+    })
+
     it('Should require an email', function () {
       let params = factories.alphaLoginParams()
       delete params.email
