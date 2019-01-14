@@ -10,7 +10,7 @@ AuthController.generateTokenForUser = function (user) {
   // TODO: jwt.sign() is synchronous, can it be a problem?
   let expiration = (new Date().getTime() / 1000) + config.jwt_duration
   return jwt.sign({
-    email: user.profile.email,
+    profile: user.profile,
     exp: expiration
   }, config.jwt_secret)
 }
