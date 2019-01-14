@@ -23,7 +23,7 @@ passport.use(new JWTStrategy({
   secretOrKey: config.jwt_secret
 },
 function (jwtPayload, done) {
-  User.findOne({ 'profile.email': jwtPayload.email }).then((user) => {
+  User.findOne({ 'profile.email': jwtPayload.profile.email }).then((user) => {
     if (!user) return done(null, false)
     return done(null, user)
   }).catch((err) => { done(err) })
