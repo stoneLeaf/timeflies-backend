@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const bcrypt = require('bcrypt')
+const crypto = require('crypto')
 
 const BCRYPT_ROUNDS = 12
 
@@ -23,6 +24,9 @@ var UserSchema = new Schema({
       required: 'An email address is required',
       // Voluntarily very permissive (comes from the Devise ruby gem)
       match: [/^[^@\s]+@[^@\s]+$/, 'The email address is invalid']
+    },
+    hashedEmail: {
+      type: String
     }
   },
   password: {
@@ -41,6 +45,12 @@ UserSchema.pre('validate', function () {
     .then((results) => {
       if (results) this.invalidate('email', 'is already taken')
     })
+})
+
+UserSchema.pre('validate', function () {
+  if (!this.profile.email) return
+  // TODO: maybe check if changed, in case of an update
+  this.profile.hashedEmail = crypto.createHash('md5').update(this.profile.email.trim()).digest('hex')
 })
 
 UserSchema.pre('save', function () {

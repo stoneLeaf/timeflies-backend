@@ -5,7 +5,8 @@ module.exports.alphaRegistrationParams = function () {
   return {
     name: 'Alpha',
     email: 'alpha@email',
-    password: 'alpha_password'
+    password: 'alpha_password',
+    hashedEmail: 'a02a535a1498ec2145ec67c0356e81c9'
   }
 }
 

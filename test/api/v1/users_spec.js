@@ -122,5 +122,14 @@ describe('API v1 integration testing: user resource', function () {
           expect(res.body.profile).to.have.property('name')
         })
     })
+
+    it('Should return a profile containing a md5 hashed email for Gravatar', function () {
+      return setAuthHeader(requester.get(endpoint), userAlphaToken)
+        .send().then(function (res) {
+          expect(res.body).to.have.property('profile')
+          expect(res.body.profile).to.have.property('hashedEmail')
+          expect(res.body.profile.hashedEmail).to.equal(factories.alphaRegistrationParams().hashedEmail)
+        })
+    })
   })
 })
