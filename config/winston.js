@@ -10,7 +10,13 @@ logger.configure({
     logger.format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss'
     }),
-    logger.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+    logger.format.splat(),
+    logger.format.printf(info => {
+      if (info.meta && info.meta instanceof Error) {
+        info.message = `${info.meta.stack}`
+      }
+      return `${info.timestamp} ${info.level}: ${info.message}`
+    })
   ),
   transports: [
     new logger.transports.Console()

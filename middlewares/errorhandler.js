@@ -1,3 +1,4 @@
+const winston = require('winston')
 
 var ErrorHandler = function (err, req, res, next) {
   if (err.name === 'SyntaxError') {
@@ -9,6 +10,7 @@ var ErrorHandler = function (err, req, res, next) {
     })
   } else {
     // Passing it to the default Express error handler
+    winston.error('', err)
     next(err)
   }
 }
