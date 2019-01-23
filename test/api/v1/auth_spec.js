@@ -54,6 +54,17 @@ describe('API v1 integration testing: authentication', function () {
       return expectRejectedParams(params)
     })
 
+    it('Should process the email as case insensitive', function () {
+      let params = factories.alphaLoginParams()
+      params.email = params.email.toUpperCase()
+      return createUserAlpha(requester).then(function () {
+        return requester.post(endpoint).send(params)
+          .then(function (res) {
+            expect(res).to.have.status(200)
+          })
+      })
+    })
+
     it('Should require a password', function () {
       let params = factories.alphaLoginParams()
       delete params.password
