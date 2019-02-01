@@ -54,8 +54,8 @@ ActivitiesController.getById = [ActivitiesController.onlyAllowOwner, function (r
 ActivitiesController.getAll = function (req, res, next) {
   // TODO: add checks to the inputs (numbers?, valid dates?, max and min values)
   let response = {}
-  response.limit = req.body.limit || 5
-  response.offset = req.body.offset || 0
+  response.limit = req.query.limit || 5
+  response.offset = req.query.offset || 0
 
   let filters = { owner: req.user._id }
   if (req.project) filters.project = req.project._id
@@ -66,7 +66,7 @@ ActivitiesController.getAll = function (req, res, next) {
     response.total = total
   }).then(function () {
     return Activity.find(filters).sort({ startDate: 'desc' })
-      .skip(response.offset).limit(response.limit).exec().then(function (arr) {
+      .skip(Number(response.offset)).limit(Number(response.limit)).exec().then(function (arr) {
         response.activities = arr.map((activity) => activity.publicJSON())
         res.status(200).json(response)
       })

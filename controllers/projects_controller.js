@@ -40,8 +40,8 @@ ProjectsController.getById = [ProjectsController.onlyAllowOwner, function (req, 
 
 ProjectsController.getAll = function (req, res, next) {
   // TODO: add checks to the input (numbers?, max and min values)
-  let limit = req.body.limit || 5
-  let offset = req.body.offset || 0
+  let limit = req.query.limit || 5
+  let offset = req.query.offset || 0
   let response = {}
 
   // TODO: could probably make a single query instead of count() + find()
@@ -49,7 +49,7 @@ ProjectsController.getAll = function (req, res, next) {
     response.total = total
   }).then(function () {
     return Project.find({ owner: req.user._id }).sort({ name: 'asc' })
-      .skip(offset).limit(limit).exec().then(function (arr) {
+      .skip(Number(offset)).limit(Number(limit)).exec().then(function (arr) {
         response.limit = limit
         response.offset = offset
         response.projects = arr.map(project => {
