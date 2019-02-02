@@ -268,7 +268,7 @@ describe(`API v1 integration testing: 'activity' resource`, function () {
       // TODO: offset not really tested because only two activities
       params.offset = 1
       return setAuthHeader(requester.get(ceresEndpoint), userAlphaToken)
-        .send(params).then(function (res) {
+        .query(params).then(function (res) {
           expect(res).to.have.status(200)
           expect(res).to.be.json
           expect(res.body).to.have.property('activities')

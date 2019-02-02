@@ -133,7 +133,7 @@ describe(`API v1 integration testing: 'project' resource`, function () {
       params.limit = 1
       params.offset = 1
       return setAuthHeader(requester.get(endpoint), userAlphaToken)
-        .send(params).then(function (res) {
+        .query(params).then(function (res) {
           expect(res).to.have.status(200)
           expect(res).to.be.json
           expect(res.body).to.have.property('projects')
