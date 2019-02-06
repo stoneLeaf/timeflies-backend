@@ -48,6 +48,11 @@ Base path: `/api/v1`
 | PATCH  | `/activities/:id`          | Update activity with id                 |
 | DELETE | `/activities/:id`          | Delete activity with id                 |
 
+| Method | Endpoint              | Description                |
+| ------ | --------------------- | -------------------------- |
+| GET    | `/stats/projects`     | Get global project stats   |
+| GET    | `/stats/projects/:id` | Get specific project stats |
+
 ## Development journal
 
 As with my [coding journey](https://github.com/stoneLeaf/coding-journey), I layed out my chain of thoughts and progress, adding insights to the commit history. It helped me to keep track of my advancement and step back when needed to get an overall perspective.
