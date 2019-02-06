@@ -41,7 +41,7 @@ ActivitySchema.pre('validate', function () {
     // Cannot have two running activities at once
     // This check is enough because we also invalidate dates happening in the futures
     return mongoose.model('Activity').findOne({
-      _id: {$ne: this._id},
+      _id: { $ne: this._id },
       owner: this.owner,
       endDate: { $exists: false }
     }).exec().then((runningActivity) => {
@@ -61,11 +61,11 @@ ActivitySchema.pre('validate', function () {
     })
   } else if (this.startDate && this.endDate) {
     return mongoose.model('Activity').findOne().or([
-      { _id: {$ne: this._id},
+      { _id: { $ne: this._id },
         owner: this.owner,
         startDate: { $lt: this.startDate },
         endDate: { $gt: this.startDate } },
-      { _id: {$ne: this._id},
+      { _id: { $ne: this._id },
         owner: this.owner,
         startDate: { $lt: this.endDate },
         endDate: { $gt: this.endDate }
@@ -76,21 +76,6 @@ ActivitySchema.pre('validate', function () {
     })
   }
 })
-
-ActivitySchema.statics.getUserRunningActivity = function (ownerId) {
-  return mongoose.model('Activity').findOne({
-    owner: ownerId,
-    endDate: { $exists: false }
-  }).exec().then(runningActivity => runningActivity)
-}
-
-ActivitySchema.statics.checkForConflicts = function (activity) {
-
-  return mongoose.model('Activity').findOne({
-    owner: ownerId,
-    endDate: { $exists: false }
-  }).exec().then(runningActivity => runningActivity)
-}
 
 ActivitySchema.methods.publicJSON = function () {
   let publicJSON = this.toObject()
