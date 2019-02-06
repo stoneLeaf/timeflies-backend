@@ -67,8 +67,7 @@ ProjectsController.update = [ProjectsController.onlyAllowOwner, function (req, r
 }]
 
 ProjectsController.delete = [ProjectsController.onlyAllowOwner, function (req, res, next) {
-  // TODO: could not find a way to trigger removal from the document itself
-  Project.deleteOne({ _id: req.project._id }).then(function () {
+  req.project.remove().then(function () {
     res.status(200).send({ message: 'Project deleted' })
   }).catch((err) => { next(err) })
 }]
