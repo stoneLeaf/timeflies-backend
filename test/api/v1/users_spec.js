@@ -12,7 +12,7 @@ const { createUserEndpoint,
 
 chai.use(chaiHttp)
 
-describe('API v1 integration testing: user resource', function () {
+describe('API v1 integration tests: user resource', function () {
   let requester = chai.request(app).keepOpen()
   let userAlphaToken
 

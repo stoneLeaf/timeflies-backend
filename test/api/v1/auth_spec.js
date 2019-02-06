@@ -13,7 +13,7 @@ const { basePath,
 
 chai.use(chaiHttp)
 
-describe('API v1 integration testing: authentication', function () {
+describe('API v1 integration tests: authentication', function () {
   let requester = chai.request(app).keepOpen()
   let userAlphaToken
 

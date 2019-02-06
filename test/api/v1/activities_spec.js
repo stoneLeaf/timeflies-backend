@@ -14,7 +14,7 @@ const { basePath,
 
 chai.use(chaiHttp)
 
-describe(`API v1 integration testing: 'activity' resource`, function () {
+describe(`API v1 integration tests: 'activity' resource`, function () {
   let requester = chai.request(app).keepOpen()
   let commonEndpoint = `${basePath}/activities`
 
