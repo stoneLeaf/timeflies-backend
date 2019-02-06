@@ -42,7 +42,7 @@ ActivitiesController.update = [ActivitiesController.onlyAllowOwner, function (re
 }]
 
 ActivitiesController.delete = [ActivitiesController.onlyAllowOwner, function (req, res, next) {
-  Activity.deleteOne({ _id: req.activity._id }).then(function () {
+  req.activity.remove().then(function () {
     res.status(200).json({ message: 'Activity deleted' })
   }).catch((err) => { next(err) })
 }]
