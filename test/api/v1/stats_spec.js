@@ -123,7 +123,7 @@ describe(`API v1 integration tests: stats`, function () {
     it('Should return global daily stats of days within specified interval', function () {
       const today = new Date()
       const yesterday = new Date(new Date(today).setDate(today.getDate() - 1))
-      const params = { firstDay: yesterday, lastDay: today }
+      const params = { firstDay: yesterday.getTime(), lastDay: today.getTime() }
       return setAuthHeader(requester.get(endpoint), userAlphaToken)
         .query(params).then(function (res) {
           expect(res).to.have.status(200)
@@ -160,7 +160,7 @@ describe(`API v1 integration tests: stats`, function () {
     it('Should return project daily stats of days within specified interval', function () {
       const today = new Date()
       const twoDaysBefore = new Date(new Date(today).setDate(today.getDate() - 2))
-      const params = { firstDay: twoDaysBefore, lastDay: today }
+      const params = { firstDay: twoDaysBefore.getTime(), lastDay: today.getTime() }
       return setAuthHeader(requester.get(endpoint), userAlphaToken)
         .query(params).then(function (res) {
           expect(res).to.have.status(200)
