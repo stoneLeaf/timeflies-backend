@@ -3,6 +3,11 @@ const Schema = mongoose.Schema
 const slugify = require('slugify')
 
 var ProjectSchema = new Schema({
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   name: {
     type: String,
     required: true,
@@ -20,7 +25,10 @@ var ProjectSchema = new Schema({
     trim: true,
     maxlength: 255
   },
-  owner: { type: Schema.Types.ObjectId, ref: 'User', required: true }
+  totalTime: {
+    type: Number,
+    default: 0
+  }
 }, { timestamps: true })
 
 ProjectSchema.pre('validate', function () {
@@ -45,6 +53,15 @@ ProjectSchema.methods.publicJSON = function () {
   delete publicJSON._id
   delete publicJSON.__v
   return publicJSON
+}
+
+/**
+ * Method used to add or remove time from totalTime.
+ *
+ * @param shift positive or negative integer representing the time in seconds
+ */
+ProjectSchema.methods.shiftTotalTime = function (shift) {
+  this.totalTime = this.totalTime + shift
 }
 
 // TODO: add pre/post remove middleware removing dependent activities
