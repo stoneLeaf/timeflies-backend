@@ -89,13 +89,13 @@ StatsController.getProjectStats = function (req, res, next) {
         const outputDays = days.map(day => {
           return {
             day: day.start,
-            timeCount: day.amount
+            timeCount: Math.floor(day.amount)
           }
         })
 
         return res.status(200).json({
-          globalTimeCount: globalTotal,
-          intervalTimeCount: intervalTimeCount,
+          globalTimeCount: Math.floor(globalTotal),
+          intervalTimeCount: Math.floor(intervalTimeCount),
           days: outputDays
         })
       })
