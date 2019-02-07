@@ -8,7 +8,10 @@ router.all('*', auth.required)
 
 router.param('project_id', ProjectsController.setProjectOnParam)
 
-router.get('/projects', StatsController.getProjectGlobal)
-router.get('/projects/:project_id', StatsController.getProjectById)
+router.get('/projects', StatsController.getProjectStats)
+router.get('/projects/:project_id', [
+  StatsController.onlyAllowOwner,
+  StatsController.getProjectStats
+])
 
 module.exports = router
