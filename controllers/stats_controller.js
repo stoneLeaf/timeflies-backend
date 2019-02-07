@@ -32,8 +32,8 @@ StatsController.getProjectStats = function (req, res, next) {
       return res.status(200).json({ globalTimeCount: globalTotal })
     }
 
-    const start = new Date(req.query.firstDay).setHours(0, 0, 0, 0)
-    const end = new Date(req.query.lastDay).setHours(24, 0, 0, 0)
+    const start = new Date(+req.query.firstDay).setHours(0, 0, 0, 0)
+    const end = new Date(+req.query.lastDay).setHours(24, 0, 0, 0)
 
     const activityFilter = {}
     if (req.project) {
