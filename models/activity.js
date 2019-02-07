@@ -2,6 +2,16 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 var ActivitySchema = new Schema({
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  project: {
+    type: Schema.Types.ObjectId,
+    ref: 'Project',
+    required: true
+  },
   startDate: {
     type: Date,
     required: true
@@ -12,9 +22,7 @@ var ActivitySchema = new Schema({
   description: {
     type: String,
     maxlength: 255
-  },
-  owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  project: { type: Schema.Types.ObjectId, ref: 'Project', required: true }
+  }
 }, { timestamps: true })
 
 ActivitySchema.pre('validate', function () {
@@ -75,6 +83,38 @@ ActivitySchema.pre('validate', function () {
       }
     })
   }
+})
+
+/**
+ * Method used to increment or decrement parent project totalTime.
+ *
+ * @param action 'add' or 'remove'
+ */
+ActivitySchema.methods.updateParentProjectTime = function (action) {
+  if (!this.endDate) return
+  return mongoose.model('Project').findOne({ _id: this.project }).exec()
+    .then(project => {
+      let duration = (this.endDate.getTime() - this.startDate.getTime()) / 1000
+      if (action === 'remove') {
+        duration = duration * -1
+      }
+      project.shiftTotalTime(duration)
+      return project.save()
+    })
+}
+
+/**
+ * Post save hook used to increment the parent project totalTime.
+ */
+ActivitySchema.post('save', function () {
+  this.updateParentProjectTime('add')
+})
+
+/**
+ * Post remove hook used to decrement the parent project totalTime.
+ */
+ActivitySchema.post('remove', function () {
+  this.updateParentProjectTime('remove')
 })
 
 ActivitySchema.methods.publicJSON = function () {
