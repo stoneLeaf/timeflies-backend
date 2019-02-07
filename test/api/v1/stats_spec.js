@@ -67,33 +67,33 @@ describe(`API v1 integration tests: stats`, function () {
 
     const yesterdayMidnight = new Date()
     yesterdayMidnight.setDate(yesterdayMidnight.getDate() - 1)
-    yesterdayMidnight.setHours(0)
+    yesterdayMidnight.setHours(0, 0, 0, 0)
 
     // Yesterday, Ceres, 1 hour
     return setAuthHeader(requester.post(createCeresActivityEndpoint), userAlphaToken)
-      .send({ startDate: yesterdayMidnight, endDate: new Date(yesterdayMidnight).setHours(1) })
+      .send({ startDate: yesterdayMidnight, endDate: new Date(yesterdayMidnight).setHours(1, 0, 0, 0) })
       .then(function (res) {
         expect(res).to.have.status(201)
         // Yesterday, Ceres, 1 hour
         return setAuthHeader(requester.post(createCeresActivityEndpoint), userAlphaToken)
-          .send({ startDate: new Date(yesterdayMidnight).setHours(2), endDate: new Date(yesterdayMidnight).setHours(3) })
+          .send({ startDate: new Date(yesterdayMidnight).setHours(2, 0, 0, 0), endDate: new Date(yesterdayMidnight).setHours(3, 0, 0, 0) })
       }).then(function (res) {
         expect(res).to.have.status(201)
         // Two days before, Ceres, 1 hour
         const twoDaysBeforeAtMidnight = new Date(yesterdayMidnight).setDate(yesterdayMidnight.getDate() - 1)
         return setAuthHeader(requester.post(createCeresActivityEndpoint), userAlphaToken)
-          .send({ startDate: twoDaysBeforeAtMidnight, endDate: new Date(twoDaysBeforeAtMidnight).setHours(1) })
+          .send({ startDate: twoDaysBeforeAtMidnight, endDate: new Date(twoDaysBeforeAtMidnight).setHours(1, 0, 0, 0) })
       }).then(function (res) {
         expect(res).to.have.status(201)
         // Three days before, Ceres, 2 hour
         const threeDaysBeforeAtMidnight = new Date(yesterdayMidnight).setDate(yesterdayMidnight.getDate() - 2)
         return setAuthHeader(requester.post(createCeresActivityEndpoint), userAlphaToken)
-          .send({ startDate: threeDaysBeforeAtMidnight, endDate: new Date(threeDaysBeforeAtMidnight).setHours(2) })
+          .send({ startDate: threeDaysBeforeAtMidnight, endDate: new Date(threeDaysBeforeAtMidnight).setHours(2, 0, 0, 0) })
       }).then(function (res) {
         expect(res).to.have.status(201)
         // Yesterday, Venus, 4 hour
         return setAuthHeader(requester.post(createVenusActivityEndpoint), userAlphaToken)
-          .send({ startDate: new Date(yesterdayMidnight).setHours(12), endDate: new Date(yesterdayMidnight).setHours(16) })
+          .send({ startDate: new Date(yesterdayMidnight).setHours(12, 0, 0, 0), endDate: new Date(yesterdayMidnight).setHours(16, 0, 0, 0) })
       }).then(function (res) {
         expect(res).to.have.status(201)
       })
@@ -122,8 +122,8 @@ describe(`API v1 integration tests: stats`, function () {
 
     it('Should return global daily stats of days within specified interval', function () {
       const today = new Date()
-      const yesterday = new Date(today).setDate(today.getDate() - 1)
-      const params = { first: yesterday, last: today }
+      const yesterday = new Date(new Date(today).setDate(today.getDate() - 1))
+      const params = { firstDay: yesterday, lastDay: today }
       return setAuthHeader(requester.get(endpoint), userAlphaToken)
         .query(params).then(function (res) {
           expect(res).to.have.status(200)
@@ -134,8 +134,8 @@ describe(`API v1 integration tests: stats`, function () {
           expect(res.body.intervalTimeCount).to.be.equal(6 * 3600)
           expect(res.body).to.have.property('days')
           expect(res.body.days).to.be.an('array').and.have.lengthOf(2)
-          expect(res.body.days[0]).to.nested.include({ timeCount: 0 })
-          expect(res.body.days[1]).to.nested.include({ timeCount: 6 * 3600 })
+          expect(res.body.days[0]).to.nested.include({ timeCount: 6 * 3600 })
+          expect(res.body.days[1]).to.nested.include({ timeCount: 0 })
         })
     })
   })
@@ -152,28 +152,28 @@ describe(`API v1 integration tests: stats`, function () {
         .then(function (res) {
           expect(res).to.have.status(200)
           expect(res).to.be.json
-          expect(res.body).to.have.property('projectTimeCount')
+          expect(res.body).to.have.property('globalTimeCount')
           expect(res.body.globalTimeCount).to.be.equal(ceresProjectTimeCount)
         })
     })
 
     it('Should return project daily stats of days within specified interval', function () {
       const today = new Date()
-      const twoDaysBefore = new Date(today).setDate(today.getDate() - 2)
-      const params = { first: twoDaysBefore, last: today }
+      const twoDaysBefore = new Date(new Date(today).setDate(today.getDate() - 2))
+      const params = { firstDay: twoDaysBefore, lastDay: today }
       return setAuthHeader(requester.get(endpoint), userAlphaToken)
         .query(params).then(function (res) {
           expect(res).to.have.status(200)
           expect(res).to.be.json
           expect(res.body).to.have.property('globalTimeCount')
-          expect(res.body.globalTimeCount).to.be.equal(alphaGlobalTimeCount)
+          expect(res.body.globalTimeCount).to.be.equal(ceresProjectTimeCount)
           expect(res.body).to.have.property('intervalTimeCount')
           expect(res.body.intervalTimeCount).to.be.equal(3 * 3600)
           expect(res.body).to.have.property('days')
           expect(res.body.days).to.be.an('array').and.have.lengthOf(3)
-          expect(res.body.days[0]).to.nested.include({ timeCount: 0 })
+          expect(res.body.days[0]).to.nested.include({ timeCount: 1 * 3600 })
           expect(res.body.days[1]).to.nested.include({ timeCount: 2 * 3600 })
-          expect(res.body.days[2]).to.nested.include({ timeCount: 1 * 3600 })
+          expect(res.body.days[2]).to.nested.include({ timeCount: 0 })
         })
     })
   })
