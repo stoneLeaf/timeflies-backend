@@ -131,5 +131,15 @@ describe('API v1 integration tests: user resource', function () {
           expect(res.body.profile.hashedEmail).to.equal(factories.alphaRegistrationParams().hashedEmail)
         })
     })
+
+    it('Should return seenDashboardNotice preference nested in profile', function () {
+      return setAuthHeader(requester.get(endpoint), userAlphaToken)
+        .send().then(function (res) {
+          expect(res.body).to.have.property('profile')
+          expect(res.body.profile).to.have.property('preferences')
+          expect(res.body.profile.preferences).to.have.property('seenDashboardNotice')
+          expect(res.body.profile.preferences.seenDashboardNotice).to.equal(false)
+        })
+    })
   })
 })
