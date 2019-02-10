@@ -115,7 +115,7 @@ describe(`API v1 integration tests: 'project' resource`, function () {
         })
     })
 
-    it('Should output a array in alphabetical order', function () {
+    it('Should output a array in descending creation order', function () {
       return setAuthHeader(requester.get(endpoint), userAlphaToken)
         .send().then(function (res) {
           expect(res).to.have.status(200)
@@ -123,8 +123,8 @@ describe(`API v1 integration tests: 'project' resource`, function () {
           expect(res.body).to.have.property('projects')
           expect(res.body.projects).to.be.an('array').and.have.lengthOf(3)
           expect(res.body.projects[0]).to.nested.include({ id: aldebaranProjectId.toString() })
-          expect(res.body.projects[1]).to.nested.include({ id: ceresProjectId.toString() })
-          expect(res.body.projects[2]).to.nested.include({ id: venusProjectId.toString() })
+          expect(res.body.projects[1]).to.nested.include({ id: venusProjectId.toString() })
+          expect(res.body.projects[2]).to.nested.include({ id: ceresProjectId.toString() })
         })
     })
 
@@ -138,7 +138,7 @@ describe(`API v1 integration tests: 'project' resource`, function () {
           expect(res).to.be.json
           expect(res.body).to.have.property('projects')
           expect(res.body.projects).to.be.an('array').and.have.lengthOf(1)
-          expect(res.body.projects[0]).to.nested.include({ id: ceresProjectId.toString() })
+          expect(res.body.projects[0]).to.nested.include({ id: venusProjectId.toString() })
           expect(res.body).to.have.property('total')
           expect(res.body.total).to.be.equal(3)
         })
