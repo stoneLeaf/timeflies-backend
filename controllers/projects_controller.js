@@ -44,11 +44,14 @@ ProjectsController.getAll = function (req, res, next) {
   let offset = req.query.offset || 0
   let response = {}
 
+  let sort = req.query.sort || 'createdAt'
+  let order = req.query.offset || 'desc'
+
   // TODO: could probably make a single query instead of count() + find()
   Project.countDocuments({ owner: req.user._id }).then(function (total) {
     response.total = total
   }).then(function () {
-    return Project.find({ owner: req.user._id }).sort({ name: 'asc' })
+    return Project.find({ owner: req.user._id }).sort({ [sort]: order })
       .skip(Number(offset)).limit(Number(limit)).exec().then(function (arr) {
         response.limit = limit
         response.offset = offset
