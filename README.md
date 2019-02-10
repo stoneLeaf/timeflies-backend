@@ -29,6 +29,7 @@ Base path: `/api/v1`
 | ------- | ------------- | ----------------------------------- |
 | POST    | `/users`      | Register an account                 |
 | GET     | `/profile`    | Get logged in user profile          |
+| PATCH   | `/profile`    | Update current user profile         |
 | POST    | `/auth/login` | Get token for bearer authentication |
 
 | Method | Endpoint        | Description                |
