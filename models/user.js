@@ -27,6 +27,12 @@ var UserSchema = new Schema({
     },
     hashedEmail: {
       type: String
+    },
+    preferences: {
+      seenDashboardNotice: {
+        type: Boolean,
+        default: false
+      }
     }
   },
   password: {
