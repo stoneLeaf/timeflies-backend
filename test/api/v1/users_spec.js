@@ -41,19 +41,19 @@ describe('API v1 integration tests: user resource', function () {
 
       it('Should require an email', function () {
         let params = factories.alphaRegistrationParams()
-        delete params.email
+        delete params.profile.email
         return expectRejectedParams(params)
       })
 
       it('Should require a name', function () {
         let params = factories.alphaRegistrationParams()
-        delete params.name
+        delete params.profile.name
         return expectRejectedParams(params)
       })
 
       it('Should require a valid email', function () {
         let params = factories.alphaRegistrationParams()
-        params.email = 'invalid'
+        params.profile.email = 'invalid'
         return expectRejectedParams(params)
       })
 

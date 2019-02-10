@@ -3,8 +3,10 @@
 
 module.exports.alphaRegistrationParams = function () {
   return {
-    name: 'Alpha',
-    email: 'alpha@email',
+    profile: {
+      name: 'Alpha',
+      email: 'alpha@email'
+    },
     password: 'alpha_password',
     hashedEmail: 'a02a535a1498ec2145ec67c0356e81c9'
   }
@@ -19,8 +21,10 @@ module.exports.alphaLoginParams = function () {
 
 module.exports.betaRegistrationParams = function () {
   return {
-    name: 'Beta',
-    email: 'beta@email',
+    profile: {
+      name: 'Beta',
+      email: 'beta@email'
+    },
     password: 'beta_password'
   }
 }
