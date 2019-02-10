@@ -69,9 +69,9 @@ describe('API v1 integration tests: user resource', function () {
         return expectRejectedParams(params)
       })
 
-      it('Should require a password of maximum 128 characters', function () {
+      it('Should require a password of maximum 30 characters', function () {
         let params = factories.alphaRegistrationParams()
-        params.password = 'f'.repeat(129)
+        params.password = 'f'.repeat(31)
         return expectRejectedParams(params)
       })
 
