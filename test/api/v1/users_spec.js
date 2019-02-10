@@ -142,4 +142,30 @@ describe('API v1 integration tests: user resource', function () {
         })
     })
   })
+
+  describe('PATCH /profile (Update current user profile)', function () {
+    let endpoint = userProfileEndpoint
+
+    it('Should return the current user updated profile', function () {
+      const params = {
+        profile: {
+          name: 'Alpha 2.0',
+          preferences: {
+            seenDashboardNotice: true
+          }
+        }
+      }
+      return setAuthHeader(requester.patch(endpoint), userAlphaToken)
+        .send(params).then(function (res) {
+          expect(res).to.have.status(200)
+          expect(res).to.be.json
+          expect(res.body).to.have.property('profile')
+          expect(res.body.profile).to.have.property('name')
+          expect(res.body.profile.name).to.equal(params.profile.name)
+          expect(res.body.profile).to.have.property('preferences')
+          expect(res.body.profile.preferences).to.have.property('seenDashboardNotice')
+          expect(res.body.profile.preferences.seenDashboardNotice).to.equal(params.profile.preferences.seenDashboardNotice)
+        })
+    })
+  })
 })
