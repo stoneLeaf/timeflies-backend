@@ -38,7 +38,6 @@ var UserSchema = new Schema({
   password: {
     type: String,
     minlength: 8,
-    maxlength: 30,
     match: [/^\S+$/, 'The password can not contain spaces.'],
     required: 'The password is required.'
   }
@@ -46,20 +45,30 @@ var UserSchema = new Schema({
 
 // Because the unique option only creates the index and does not do validation
 UserSchema.pre('validate', function () {
-  return mongoose.model('User').findOne({ 'profile.email': this.profile.email }).exec()
+  return mongoose.model('User').findOne({ '_id': { $ne: this._id }, 'profile.email': this.profile.email }).exec()
     // Using arrow function to keep context
     .then((results) => {
       if (results) this.invalidate('email', 'is already taken')
     })
 })
 
+/**
+ * Not using the built-in validator because it checks for max length even
+ * on document update when it has already been transformed to a hash.
+ */
+UserSchema.pre('validate', function () {
+  if (!this.isModified('password')) return
+  if (this.password && this.password.length > 30) this.invalidate('password', 'is too long (max 30 characters)')
+})
+
 UserSchema.pre('validate', function () {
   if (!this.profile.email) return
-  // TODO: maybe check if changed, in case of an update
+  if (!this.isModified('profile.email')) return
   this.profile.hashedEmail = crypto.createHash('md5').update(this.profile.email.trim()).digest('hex')
 })
 
 UserSchema.pre('save', function () {
+  if (!this.isModified('password')) return
   return bcrypt.hash(this.password, BCRYPT_ROUNDS).then((hash) => {
     this.password = hash
   })
